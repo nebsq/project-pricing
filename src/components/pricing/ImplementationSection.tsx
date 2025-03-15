@@ -49,12 +49,12 @@ const ImplementationSection = ({
           </div>
           <div className="col-span-3 flex justify-end">
             <Input
-              type="text"
+              type="number"
               inputMode="decimal"
               value={implementationFee === null ? '' : implementationFee}
               onChange={handleImplementationFeeChange}
               className="w-24 text-right"
-              placeholder="0"
+              placeholder=""
             />
           </div>
         </div>
@@ -69,12 +69,12 @@ const ImplementationSection = ({
           </div>
           <div className="col-span-3 flex justify-end">
             <Input
-              type="text"
+              type="number"
               inputMode="decimal"
               value={annualDiscount === null ? '' : annualDiscount}
               onChange={handleAnnualDiscountChange}
               className="w-24 text-right"
-              placeholder="0"
+              placeholder=""
             />
           </div>
         </div>

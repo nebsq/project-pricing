@@ -1,4 +1,3 @@
-
 import { PricingModule } from "@/types/databaseTypes";
 import { formatCurrency } from "@/lib/utils";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -39,6 +38,13 @@ const QuoteSummary = ({
     return baseAnnual;
   };
 
+  // Add calculation for discount amount
+  const calculateDiscountAmount = () => {
+    if (annualDiscount === null) return 0;
+    const baseAnnual = calculateMonthlyCost() * 12;
+    return baseAnnual * (annualDiscount / 100);
+  };
+
   // Calculate implementation fee
   const calculateImplementationFee = () => {
     if (implementationFee === null) return 0;
@@ -57,6 +63,7 @@ const QuoteSummary = ({
   const monthlyCost = calculateMonthlyCost();
   const annualCost = calculateAnnualCost();
   const implFee = calculateImplementationFee();
+  const discountAmount = calculateDiscountAmount();
 
   return (
     <Card className="shadow-md">
@@ -65,7 +72,7 @@ const QuoteSummary = ({
           Quote Summary
         </CardTitle>
       </CardHeader>
-      <CardContent className="pt-4 bg-white">
+      <CardContent className="pt-4 bg-white rounded-b-lg">
         <div className="space-y-6">
           <div className="space-y-2">
             <div className="flex justify-between text-lg">
@@ -74,12 +81,18 @@ const QuoteSummary = ({
             </div>
             <div className="flex justify-between text-lg">
               <span>Annual Cost</span>
-              <span className="font-bold">{formatCurrency(annualCost)}</span>
+              <span className="font-bold">{formatCurrency(monthlyCost * 12)}</span>
             </div>
+            {annualDiscount !== null && annualDiscount > 0 && (
+              <div className="flex justify-between text-sm text-gray-600">
+                <span>Annual Discount ({annualDiscount}%)</span>
+                <span className="font-medium">- {formatCurrency(discountAmount)}</span>
+              </div>
+            )}
             {implementationFee !== null && implementationFee > 0 && (
-              <div className="flex justify-between text-base text-gray-600">
+              <div className="flex justify-between text-sm text-gray-600">
                 <span>Implementation Fee ({implementationFee}%)</span>
-                <span className="font-medium">{formatCurrency(implFee)}</span>
+                <span className="font-medium">+ {formatCurrency(implFee)}</span>
               </div>
             )}
             {(implementationFee !== null && implementationFee > 0) && (
