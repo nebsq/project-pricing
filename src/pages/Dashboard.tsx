@@ -7,10 +7,10 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { Profile, PricingModule } from "@/types/databaseTypes";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import ModuleGroup from "@/components/pricing/ModuleGroup";
+import ModuleFeature from "@/components/pricing/ModuleFeature";
 import QuoteSummary from "@/components/pricing/QuoteSummary";
 import { groupBy } from "@/lib/utils";
+import ModuleGroup from "@/components/pricing/ModuleGroup";
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -103,47 +103,51 @@ const Dashboard = () => {
   }
 
   return (
-    <div className="container mx-auto p-6 max-w-7xl">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold text-[#F97316]">inploi Pricing Calculator</h1>
-        <Button onClick={handleSignOut} variant="outline">Sign Out</Button>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
-        {/* Pricing Module Selection Area */}
-        <div className="md:col-span-8">
-          <Card>
-            <CardHeader className="pb-0">
-              <CardTitle>Create Your Quote</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-12 py-4 font-semibold text-sm text-muted-foreground border-b">
-                <div className="col-span-6">MODULE</div>
-                <div className="col-span-3">MONTHLY PRICE</div>
-                <div className="col-span-3">QUANTITY</div>
-              </div>
-              
-              <ScrollArea className="h-[calc(100vh-220px)] pr-4">
-                {Object.entries(groupedModules).map(([moduleName, features]) => (
-                  <ModuleGroup
-                    key={moduleName}
-                    moduleName={moduleName}
-                    features={features}
-                    quantities={quantities}
-                    onChange={handleQuantityChange}
-                  />
-                ))}
-              </ScrollArea>
-            </CardContent>
-          </Card>
+    <div className="min-h-screen bg-[#F9F8F4]">
+      <div className="container mx-auto p-6 max-w-7xl">
+        <div className="flex justify-between items-center mb-6">
+          <h1 className="text-3xl font-bold text-[#F97316]">inploi Pricing Calculator</h1>
+          <Button onClick={handleSignOut} variant="outline">Sign Out</Button>
         </div>
 
-        {/* Quote Summary */}
-        <div className="md:col-span-4">
-          <QuoteSummary
-            selectedModules={pricingModules}
-            quantities={quantities}
-          />
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
+          {/* Pricing Module Selection Area */}
+          <div className="md:col-span-8">
+            <Card className="mb-8">
+              <CardHeader className="pb-0 border-b">
+                <CardTitle>Create Your Quote</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-12 py-4 font-semibold text-sm text-muted-foreground border-b">
+                  <div className="col-span-6">MODULE</div>
+                  <div className="col-span-3">MONTHLY PRICE</div>
+                  <div className="col-span-3">QUANTITY</div>
+                </div>
+                
+                <div>
+                  {Object.entries(groupedModules).map(([moduleName, features]) => (
+                    <ModuleGroup
+                      key={moduleName}
+                      moduleName={moduleName}
+                      features={features}
+                      quantities={quantities}
+                      onChange={handleQuantityChange}
+                    />
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Quote Summary */}
+          <div className="md:col-span-4">
+            <div className="sticky top-6">
+              <QuoteSummary
+                selectedModules={pricingModules}
+                quantities={quantities}
+              />
+            </div>
+          </div>
         </div>
       </div>
     </div>

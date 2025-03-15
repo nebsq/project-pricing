@@ -20,7 +20,7 @@ const ModuleFeature = ({ feature, quantity, onChange }: ModuleFeatureProps) => {
   };
 
   return (
-    <div className="py-3 grid grid-cols-12 items-center">
+    <div className="py-4 grid grid-cols-12 items-center">
       <div className="col-span-6">
         <p className="text-sm font-medium">{feature.feature}</p>
         <p className="text-xs text-muted-foreground">{feature.unit}</p>
@@ -38,7 +38,7 @@ const ModuleFeature = ({ feature, quantity, onChange }: ModuleFeatureProps) => {
         />
       </div>
       {quantity > 0 && (
-        <div className="col-span-12 text-right text-sm mt-1">
+        <div className="col-span-12 text-right text-sm mt-1 text-[#F97316]">
           Monthly cost: {formatCurrency(calculatePrice())}
         </div>
       )}

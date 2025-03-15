@@ -13,12 +13,11 @@ interface ModuleGroupProps {
 const ModuleGroup = ({ moduleName, features, quantities, onChange }: ModuleGroupProps) => {
   return (
     <div className="mb-6">
-      <h3 className="text-lg font-bold mb-2 sticky top-0 bg-background z-10 py-2">
-        {moduleName}
-      </h3>
-      <p className="text-sm text-muted-foreground mb-4">
-        {features[0]?.unit}
-      </p>
+      <div className="bg-[#F97316] text-white p-4 rounded-md mb-4">
+        <h3 className="text-lg font-bold">
+          {moduleName}
+        </h3>
+      </div>
       
       {features.map((feature) => (
         <div key={feature.id}>

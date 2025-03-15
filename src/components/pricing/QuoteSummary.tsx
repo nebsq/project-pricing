@@ -41,13 +41,13 @@ const QuoteSummary = ({ selectedModules, quantities }: QuoteSummaryProps) => {
   const annualCost = calculateAnnualCost();
 
   return (
-    <Card className="sticky top-4">
-      <CardHeader className="pb-2">
-        <CardTitle className="text-xl font-bold text-center bg-[#F9FAFB] p-3 rounded-md">
-          Total Annual Cost: {formatCurrency(annualCost)}
+    <Card className="shadow">
+      <CardHeader className="pb-2 bg-[#F9F7EC] rounded-t-lg">
+        <CardTitle className="text-xl font-bold text-center">
+          Quote Summary
         </CardTitle>
       </CardHeader>
-      <CardContent>
+      <CardContent className="pt-4">
         <div className="space-y-6">
           <div className="space-y-2">
             <div className="flex justify-between text-lg">
@@ -79,7 +79,7 @@ const QuoteSummary = ({ selectedModules, quantities }: QuoteSummaryProps) => {
                         <span className="text-sm">
                           {item.feature} × {quantities[item.id]} {quantities[item.id] === 1 ? item.unit : `${item.unit}s`}
                         </span>
-                        <span className="font-medium">
+                        <span className="font-medium text-[#F97316]">
                           {formatCurrency(item.monthly_price * quantities[item.id])}
                         </span>
                       </div>
