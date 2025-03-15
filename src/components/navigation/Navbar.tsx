@@ -1,8 +1,8 @@
-
 import { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
 import AnimatedButton from '../ui/AnimatedButton';
 import { ChevronRight, Menu, X } from 'lucide-react';
+import { HoldButton } from "@/components/ui/hold-button"
 
 type NavItem = {
   name: string;
@@ -65,6 +65,7 @@ const Navbar = () => {
                 <span className="absolute inset-x-0 -bottom-1 h-0.5 bg-primary transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 ease-out" />
               </a>
             ))}
+            <HoldButton />
           </div>
           
           {/* Call to Action Button */}

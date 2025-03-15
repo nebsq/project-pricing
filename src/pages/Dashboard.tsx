@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -11,6 +10,7 @@ import { groupBy } from "@/lib/utils";
 import ModuleGroup from "@/components/pricing/ModuleGroup";
 import QuoteSummary from "@/components/pricing/QuoteSummary";
 import ImplementationSection from "@/components/pricing/ImplementationSection";
+import { DashboardNav } from "@/components/navigation/DashboardNav"
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -95,83 +95,88 @@ const Dashboard = () => {
 
   if (loading) {
     return (
-      <div className="container mx-auto p-6 max-w-7xl">
-        <Card>
-          <CardHeader>
-            <Skeleton className="h-8 w-1/3" />
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              <Skeleton className="h-4 w-full" />
-              <Skeleton className="h-4 w-full" />
-              <Skeleton className="h-4 w-full" />
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-    );
+      <>
+        <DashboardNav />
+        <div className="container mx-auto p-6 max-w-7xl pt-20">
+          <Card>
+            <CardHeader>
+              <Skeleton className="h-8 w-1/3" />
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <Skeleton className="h-4 w-full" />
+                <Skeleton className="h-4 w-full" />
+                <Skeleton className="h-4 w-full" />
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </>
+    )
   }
 
   return (
-    <div className="min-h-screen bg-[#F9F8F4]">
-      <div className="container mx-auto p-6 max-w-7xl">
-        <div className="flex justify-between items-center mb-8">
-          <h1 className="text-3xl font-bold text-[#F97316] font-display tracking-tight">
-            <span className="bg-gradient-to-r from-[#F97316] to-[#FF9A3C] bg-clip-text text-transparent">
-              inploi pricing calculator
-            </span>
-          </h1>
-          <Button onClick={handleSignOut} variant="outline">Sign Out</Button>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-8">
-          {/* Pricing Module Selection Area */}
-          <div className="md:col-span-8">
-            <Card className="mb-6 shadow-sm border-none bg-transparent">
-              <CardHeader className="pb-2 px-0">
-                <CardTitle className="text-2xl font-bold text-gray-800 font-display flex items-center">
-                  Create Your Quote
-                  <div className="h-1 w-16 bg-gradient-to-r from-[#F97316] to-[#FF9A3C] ml-4 rounded-full"></div>
-                </CardTitle>
-              </CardHeader>
-            </Card>
-            
-            <div className="space-y-6">
-              {Object.entries(groupedModules).map(([moduleName, features]) => (
-                <ModuleGroup
-                  key={moduleName}
-                  moduleName={moduleName}
-                  features={features}
-                  quantities={quantities}
-                  onChange={handleQuantityChange}
-                />
-              ))}
-              
-              {/* Implementation & Others Section */}
-              <ImplementationSection 
-                implementationFee={implementationFee}
-                annualDiscount={annualDiscount}
-                onImplementationFeeChange={handleImplementationFeeChange}
-                onAnnualDiscountChange={handleAnnualDiscountChange}
-              />
-            </div>
+    <>
+      <DashboardNav onSignOut={handleSignOut} />
+      <div className="min-h-screen bg-[#F9F8F4]">
+        <div className="container mx-auto p-6 max-w-7xl pt-20">
+          <div className="flex justify-between items-center mb-8">
+            <h1 className="text-3xl font-bold text-[#F97316] font-display tracking-tight">
+              <span className="bg-gradient-to-r from-[#F97316] to-[#FF9A3C] bg-clip-text text-transparent">
+                inploi pricing calculator
+              </span>
+            </h1>
           </div>
 
-          {/* Quote Summary */}
-          <div className="md:col-span-4">
-            <div className="sticky top-6">
-              <QuoteSummary
-                selectedModules={pricingModules}
-                quantities={quantities}
-                implementationFee={implementationFee}
-                annualDiscount={annualDiscount}
-              />
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-8">
+            {/* Pricing Module Selection Area */}
+            <div className="md:col-span-8">
+              <Card className="mb-6 shadow-sm border-none bg-transparent">
+                <CardHeader className="pb-2 px-0">
+                  <CardTitle className="text-2xl font-bold text-gray-800 font-display flex items-center">
+                    Create Your Quote
+                    <div className="h-1 w-16 bg-gradient-to-r from-[#F97316] to-[#FF9A3C] ml-4 rounded-full"></div>
+                  </CardTitle>
+                </CardHeader>
+              </Card>
+              
+              <div className="space-y-6">
+                {Object.entries(groupedModules).map(([moduleName, features]) => (
+                  <ModuleGroup
+                    key={moduleName}
+                    moduleName={moduleName}
+                    features={features}
+                    quantities={quantities}
+                    onChange={handleQuantityChange}
+                  />
+                ))}
+                
+                {/* Implementation & Others Section */}
+                <ImplementationSection 
+                  implementationFee={implementationFee}
+                  annualDiscount={annualDiscount}
+                  onImplementationFeeChange={handleImplementationFeeChange}
+                  onAnnualDiscountChange={handleAnnualDiscountChange}
+                />
+              </div>
+            </div>
+
+            {/* Quote Summary */}
+            <div className="md:col-span-4">
+              <div className="sticky top-6">
+                <QuoteSummary
+                  selectedModules={pricingModules}
+                  quantities={quantities}
+                  implementationFee={implementationFee}
+                  annualDiscount={annualDiscount}
+                />
+              </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
-  );
+    </>
+  )
 };
 
 export default Dashboard;
