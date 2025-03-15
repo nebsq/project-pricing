@@ -32,9 +32,9 @@ const Dashboard = () => {
         return;
       }
 
-      // Use type assertion to bypass the type checking for the 'profiles' table
-      const { data, error } = await (supabase
-        .from('profiles') as any)
+      // Now that the tables exist in the database, we can use proper typing
+      const { data, error } = await supabase
+        .from('profiles')
         .select('*')
         .eq('id', user.id)
         .single();
@@ -50,9 +50,9 @@ const Dashboard = () => {
 
   const fetchPricingModules = async () => {
     try {
-      // Use type assertion to bypass the type checking for the 'pricing_modules' table
-      const { data, error } = await (supabase
-        .from('pricing_modules') as any)
+      // Now that the table exists in the database, we can use proper typing
+      const { data, error } = await supabase
+        .from('pricing_modules')
         .select('*')
         .order('module')
         .order('feature');
