@@ -1,16 +1,15 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { toast } from "@/components/ui/use-toast";
+import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { Profile, PricingModule } from "@/types/databaseTypes";
 import { groupBy } from "@/lib/utils";
 import ModuleGroup from "@/components/pricing/ModuleGroup";
 import QuoteSummary from "@/components/pricing/QuoteSummary";
 import ImplementationSection from "@/components/pricing/ImplementationSection";
-import { DashboardNav } from "@/components/navigation/DashboardNav"
+import { DashboardNav } from "@/components/navigation/DashboardNav";
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -29,20 +28,11 @@ const Dashboard = () => {
   const checkUser = async () => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
-      
       if (!user) {
         navigate('/auth');
-        return;
+      } else {
+        setProfile(user);
       }
-
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', user.id)
-        .single();
-
-      if (error) throw error;
-      setProfile(data as Profile);
     } catch (error: any) {
       console.error('Error checking user:', error.message);
     } finally {
@@ -62,11 +52,7 @@ const Dashboard = () => {
       setPricingModules(data as PricingModule[] || []);
     } catch (error: any) {
       console.error('Error fetching pricing modules:', error.message);
-      toast({
-        title: "Error",
-        description: "Failed to load pricing modules.",
-        variant: "destructive"
-      });
+      toast.error("Failed to load pricing modules");
     }
   };
 
@@ -90,13 +76,12 @@ const Dashboard = () => {
     setAnnualDiscount(value);
   };
 
-  // Group modules by module name
   const groupedModules = groupBy(pricingModules, 'module');
 
   if (loading) {
     return (
       <>
-        <DashboardNav />
+        <DashboardNav onSignOut={handleSignOut} />
         <div className="container mx-auto p-6 max-w-7xl pt-20">
           <Card>
             <CardHeader>
@@ -123,7 +108,7 @@ const Dashboard = () => {
           <div className="flex justify-between items-center mb-8">
             <h1 className="text-3xl font-bold text-[#F97316] font-display tracking-tight">
               <span className="bg-gradient-to-r from-[#F97316] to-[#FF9A3C] bg-clip-text text-transparent">
-                inploi pricing calculator
+                pricing calculator
               </span>
             </h1>
           </div>
@@ -131,15 +116,16 @@ const Dashboard = () => {
           <div className="grid grid-cols-1 md:grid-cols-12 gap-8">
             {/* Pricing Module Selection Area */}
             <div className="md:col-span-8">
-              <Card className="mb-6 shadow-sm border-none bg-transparent">
-                <CardHeader className="pb-2 px-0">
-                  <CardTitle className="text-2xl font-bold text-gray-800 font-display flex items-center">
-                    Create Your Quote
-                    <div className="h-1 w-16 bg-gradient-to-r from-[#F97316] to-[#FF9A3C] ml-4 rounded-full"></div>
-                  </CardTitle>
-                </CardHeader>
-              </Card>
-              
+              <div className="mb-8">
+                <h2 className="text-2xl font-display font-semibold tracking-tight">
+                  Create your quote
+                  <div className="mt-2 h-1 w-20 bg-gradient-to-r from-[#F97316] to-[#FF9A3C] rounded-full" />
+                </h2>
+                <p className="mt-2 text-muted-foreground">
+                  Select the modules and features you'd like to include
+                </p>
+              </div>
+
               <div className="space-y-6">
                 {Object.entries(groupedModules).map(([moduleName, features]) => (
                   <ModuleGroup

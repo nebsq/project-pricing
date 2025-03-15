@@ -1,5 +1,7 @@
 import { Button } from "@/components/ui/button"
 import { HoldButton } from "@/components/ui/hold-button"
+import { useNavigate } from "react-router-dom"
+import inploiLogo from "@/assets/inploi-full-logo-primary (1).png"
 
 interface DashboardNavProps {
   onSignOut: () => Promise<void>
@@ -11,9 +13,7 @@ export function DashboardNav({ onSignOut }: DashboardNavProps) {
       <div className="container flex h-14 max-w-7xl items-center">
         <div className="mr-4 flex">
           <a className="mr-6 flex items-center space-x-2" href="/">
-            <span className="text-xl font-display font-medium tracking-tight">
-              Blank<span className="text-primary/90">Canvas</span>
-            </span>
+            <img src={inploiLogo} alt="inploi logo" className="h-8" />
           </a>
         </div>
         <div className="flex flex-1 items-center space-x-2 justify-end">
