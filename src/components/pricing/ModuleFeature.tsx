@@ -1,4 +1,3 @@
-
 import { Input } from "@/components/ui/input";
 import { PricingModule } from "@/types/databaseTypes";
 import { formatCurrency } from "@/lib/utils";
@@ -30,14 +29,13 @@ const ModuleFeature = ({ feature, quantity, onChange }: ModuleFeatureProps) => {
       </div>
       <div className="col-span-3 flex justify-end">
         <Input
-          type="text"
+          type="number"
           inputMode="numeric"
-          pattern="[0-9]*"
-          min="0"
-          value={quantity === 0 ? '' : quantity}
+          min={0}
+          value={quantity || ''} // Use empty string when quantity is 0
           onChange={handleChange}
           className="w-24 text-right"
-          placeholder="0"
+          placeholder="-"
         />
       </div>
       {quantity > 0 && (
