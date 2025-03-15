@@ -11,7 +11,7 @@ interface ModuleFeatureProps {
 
 const ModuleFeature = ({ feature, quantity, onChange }: ModuleFeatureProps) => {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = parseInt(e.target.value) || 0;
+    const value = e.target.value === '' ? 0 : parseInt(e.target.value) || 0;
     onChange(feature.id, value);
   };
 
@@ -25,7 +25,7 @@ const ModuleFeature = ({ feature, quantity, onChange }: ModuleFeatureProps) => {
         <p className="text-sm font-medium">{feature.feature}</p>
         <p className="text-xs text-muted-foreground">{feature.unit}</p>
       </div>
-      <div className="col-span-4 text-sm font-sans">
+      <div className="col-span-4 text-xs text-muted-foreground">
         {formatCurrency(feature.monthly_price)}/{feature.increment} {feature.unit}
       </div>
       <div className="col-span-3 flex justify-end">
@@ -34,9 +34,10 @@ const ModuleFeature = ({ feature, quantity, onChange }: ModuleFeatureProps) => {
           inputMode="numeric"
           pattern="[0-9]*"
           min="0"
-          value={quantity}
+          value={quantity === 0 ? '' : quantity}
           onChange={handleChange}
           className="w-24 text-right"
+          placeholder="0"
         />
       </div>
       {quantity > 0 && (

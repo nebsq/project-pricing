@@ -10,6 +10,7 @@ import { Profile, PricingModule } from "@/types/databaseTypes";
 import { groupBy } from "@/lib/utils";
 import ModuleGroup from "@/components/pricing/ModuleGroup";
 import QuoteSummary from "@/components/pricing/QuoteSummary";
+import ImplementationSection from "@/components/pricing/ImplementationSection";
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -17,6 +18,8 @@ const Dashboard = () => {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [pricingModules, setPricingModules] = useState<PricingModule[]>([]);
   const [quantities, setQuantities] = useState<Record<string, number>>({});
+  const [implementationFee, setImplementationFee] = useState<number | null>(null);
+  const [annualDiscount, setAnnualDiscount] = useState<number | null>(null);
 
   useEffect(() => {
     checkUser();
@@ -79,6 +82,14 @@ const Dashboard = () => {
     }));
   };
 
+  const handleImplementationFeeChange = (value: number | null) => {
+    setImplementationFee(value);
+  };
+
+  const handleAnnualDiscountChange = (value: number | null) => {
+    setAnnualDiscount(value);
+  };
+
   // Group modules by module name
   const groupedModules = groupBy(pricingModules, 'module');
 
@@ -105,7 +116,11 @@ const Dashboard = () => {
     <div className="min-h-screen bg-[#F9F8F4]">
       <div className="container mx-auto p-6 max-w-7xl">
         <div className="flex justify-between items-center mb-8">
-          <h1 className="text-3xl font-bold text-[#F97316]">inploi Pricing Calculator</h1>
+          <h1 className="text-3xl font-bold text-[#F97316] font-display tracking-tight">
+            <span className="bg-gradient-to-r from-[#F97316] to-[#FF9A3C] bg-clip-text text-transparent">
+              inploi pricing calculator
+            </span>
+          </h1>
           <Button onClick={handleSignOut} variant="outline">Sign Out</Button>
         </div>
 
@@ -114,7 +129,10 @@ const Dashboard = () => {
           <div className="md:col-span-8">
             <Card className="mb-6 shadow-sm border-none bg-transparent">
               <CardHeader className="pb-2 px-0">
-                <CardTitle className="text-2xl font-bold text-gray-800">Create Your Quote</CardTitle>
+                <CardTitle className="text-2xl font-bold text-gray-800 font-display flex items-center">
+                  Create Your Quote
+                  <div className="h-1 w-16 bg-gradient-to-r from-[#F97316] to-[#FF9A3C] ml-4 rounded-full"></div>
+                </CardTitle>
               </CardHeader>
             </Card>
             
@@ -128,6 +146,14 @@ const Dashboard = () => {
                   onChange={handleQuantityChange}
                 />
               ))}
+              
+              {/* Implementation & Others Section */}
+              <ImplementationSection 
+                implementationFee={implementationFee}
+                annualDiscount={annualDiscount}
+                onImplementationFeeChange={handleImplementationFeeChange}
+                onAnnualDiscountChange={handleAnnualDiscountChange}
+              />
             </div>
           </div>
 
@@ -137,6 +163,8 @@ const Dashboard = () => {
               <QuoteSummary
                 selectedModules={pricingModules}
                 quantities={quantities}
+                implementationFee={implementationFee}
+                annualDiscount={annualDiscount}
               />
             </div>
           </div>

@@ -7,9 +7,16 @@ import { Separator } from "@/components/ui/separator";
 interface QuoteSummaryProps {
   selectedModules: PricingModule[];
   quantities: Record<string, number>;
+  implementationFee: number | null;
+  annualDiscount: number | null;
 }
 
-const QuoteSummary = ({ selectedModules, quantities }: QuoteSummaryProps) => {
+const QuoteSummary = ({ 
+  selectedModules, 
+  quantities,
+  implementationFee,
+  annualDiscount
+}: QuoteSummaryProps) => {
   // Filter selected modules (those with quantity > 0)
   const selectedItems = selectedModules.filter(
     (module) => quantities[module.id] && quantities[module.id] > 0
@@ -25,7 +32,17 @@ const QuoteSummary = ({ selectedModules, quantities }: QuoteSummaryProps) => {
 
   // Calculate annual cost (monthly * 12)
   const calculateAnnualCost = () => {
-    return calculateMonthlyCost() * 12;
+    const baseAnnual = calculateMonthlyCost() * 12;
+    if (annualDiscount) {
+      return baseAnnual * (1 - annualDiscount / 100);
+    }
+    return baseAnnual;
+  };
+
+  // Calculate implementation fee
+  const calculateImplementationFee = () => {
+    if (implementationFee === null) return 0;
+    return calculateAnnualCost() * (implementationFee / 100);
   };
 
   // Group items by module
@@ -39,6 +56,7 @@ const QuoteSummary = ({ selectedModules, quantities }: QuoteSummaryProps) => {
 
   const monthlyCost = calculateMonthlyCost();
   const annualCost = calculateAnnualCost();
+  const implFee = calculateImplementationFee();
 
   return (
     <Card className="shadow-md">
@@ -47,7 +65,7 @@ const QuoteSummary = ({ selectedModules, quantities }: QuoteSummaryProps) => {
           Quote Summary
         </CardTitle>
       </CardHeader>
-      <CardContent className="pt-4">
+      <CardContent className="pt-4 bg-white">
         <div className="space-y-6">
           <div className="space-y-2">
             <div className="flex justify-between text-lg">
@@ -58,6 +76,18 @@ const QuoteSummary = ({ selectedModules, quantities }: QuoteSummaryProps) => {
               <span>Annual Cost</span>
               <span className="font-bold">{formatCurrency(annualCost)}</span>
             </div>
+            {implementationFee !== null && implementationFee > 0 && (
+              <div className="flex justify-between text-base text-gray-600">
+                <span>Implementation Fee ({implementationFee}%)</span>
+                <span className="font-medium">{formatCurrency(implFee)}</span>
+              </div>
+            )}
+            {(implementationFee !== null && implementationFee > 0) && (
+              <div className="flex justify-between text-lg pt-2 border-t">
+                <span>Total Cost</span>
+                <span className="font-bold">{formatCurrency(annualCost + implFee)}</span>
+              </div>
+            )}
           </div>
 
           <div>
