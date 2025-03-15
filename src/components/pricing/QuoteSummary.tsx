@@ -41,9 +41,9 @@ const QuoteSummary = ({ selectedModules, quantities }: QuoteSummaryProps) => {
   const annualCost = calculateAnnualCost();
 
   return (
-    <Card className="shadow">
-      <CardHeader className="pb-2 bg-[#F9F7EC] rounded-t-lg">
-        <CardTitle className="text-xl font-bold text-center">
+    <Card className="shadow-md">
+      <CardHeader className="pb-2 bg-white rounded-t-lg border-b">
+        <CardTitle className="text-xl font-bold">
           Quote Summary
         </CardTitle>
       </CardHeader>
@@ -68,9 +68,9 @@ const QuoteSummary = ({ selectedModules, quantities }: QuoteSummaryProps) => {
 
             {Object.keys(groupedItems).length > 0 ? (
               <>
-                {Object.entries(groupedItems).map(([moduleName, items]) => (
-                  <div key={moduleName} className="mb-6">
-                    <h4 className="uppercase text-sm font-semibold text-muted-foreground mb-2">
+                {Object.entries(groupedItems).map(([moduleName, items], index) => (
+                  <div key={moduleName} className="mb-4">
+                    <h4 className="uppercase text-sm font-semibold text-muted-foreground mb-2 bg-gray-50 p-2 rounded">
                       {moduleName}
                     </h4>
                     
@@ -79,11 +79,15 @@ const QuoteSummary = ({ selectedModules, quantities }: QuoteSummaryProps) => {
                         <span className="text-sm">
                           {item.feature} × {quantities[item.id]} {quantities[item.id] === 1 ? item.unit : `${item.unit}s`}
                         </span>
-                        <span className="font-medium text-[#F97316]">
+                        <span className="font-medium text-gray-700">
                           {formatCurrency(item.monthly_price * quantities[item.id])}
                         </span>
                       </div>
                     ))}
+                    
+                    {index < Object.entries(groupedItems).length - 1 && (
+                      <Separator className="my-3" />
+                    )}
                   </div>
                 ))}
               </>

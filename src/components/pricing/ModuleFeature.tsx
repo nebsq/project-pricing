@@ -21,24 +21,26 @@ const ModuleFeature = ({ feature, quantity, onChange }: ModuleFeatureProps) => {
 
   return (
     <div className="py-4 grid grid-cols-12 items-center">
-      <div className="col-span-6">
+      <div className="col-span-5">
         <p className="text-sm font-medium">{feature.feature}</p>
         <p className="text-xs text-muted-foreground">{feature.unit}</p>
       </div>
-      <div className="col-span-3 text-sm">
+      <div className="col-span-4 text-sm font-sans">
         {formatCurrency(feature.monthly_price)}/{feature.increment} {feature.unit}
       </div>
-      <div className="col-span-3">
+      <div className="col-span-3 flex justify-end">
         <Input
-          type="number"
+          type="text"
+          inputMode="numeric"
+          pattern="[0-9]*"
           min="0"
           value={quantity}
           onChange={handleChange}
-          className="w-full"
+          className="w-24 text-right"
         />
       </div>
       {quantity > 0 && (
-        <div className="col-span-12 text-right text-sm mt-1 text-[#F97316]">
+        <div className="col-span-12 text-right text-sm mt-1 text-gray-700 font-medium">
           Monthly cost: {formatCurrency(calculatePrice())}
         </div>
       )}
