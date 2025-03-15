@@ -3,20 +3,21 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { Textarea } from "@/components/ui/textarea";
-import { Skeleton } from "@/components/ui/skeleton";
 import { Profile, PricingModule } from "@/types/databaseTypes";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import ModuleGroup from "@/components/pricing/ModuleGroup";
+import QuoteSummary from "@/components/pricing/QuoteSummary";
+import { groupBy } from "@/lib/utils";
 
 const Dashboard = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
-  const [csvData, setCsvData] = useState('');
-  const [uploading, setUploading] = useState(false);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [pricingModules, setPricingModules] = useState<PricingModule[]>([]);
+  const [quantities, setQuantities] = useState<Record<string, number>>({});
 
   useEffect(() => {
     checkUser();
@@ -32,7 +33,6 @@ const Dashboard = () => {
         return;
       }
 
-      // Now that the tables exist in the database, we can use proper typing
       const { data, error } = await supabase
         .from('profiles')
         .select('*')
@@ -50,7 +50,6 @@ const Dashboard = () => {
 
   const fetchPricingModules = async () => {
     try {
-      // Now that the table exists in the database, we can use proper typing
       const { data, error } = await supabase
         .from('pricing_modules')
         .select('*')
@@ -74,61 +73,19 @@ const Dashboard = () => {
     navigate('/auth');
   };
 
-  const handleUploadCSV = async () => {
-    if (!csvData.trim()) {
-      toast({
-        title: "Error",
-        description: "Please enter CSV data",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    setUploading(true);
-    try {
-      const { data: { session } } = await supabase.auth.getSession();
-      
-      if (!session) {
-        throw new Error('Not authenticated');
-      }
-
-      const response = await fetch(`${window.location.origin}/functions/v1/csv-upload`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'text/plain',
-          'Authorization': `Bearer ${session.access_token}`
-        },
-        body: csvData
-      });
-
-      const result = await response.json();
-      
-      if (!response.ok) {
-        throw new Error(result.error || 'Unknown error occurred');
-      }
-      
-      toast({
-        title: "Success",
-        description: `${result.count} pricing modules imported successfully.`
-      });
-      
-      setCsvData('');
-      fetchPricingModules();
-    } catch (error: any) {
-      console.error('Error uploading CSV:', error);
-      toast({
-        title: "Upload Failed",
-        description: error.message,
-        variant: "destructive"
-      });
-    } finally {
-      setUploading(false);
-    }
+  const handleQuantityChange = (id: string, quantity: number) => {
+    setQuantities(prev => ({
+      ...prev,
+      [id]: quantity
+    }));
   };
+
+  // Group modules by module name
+  const groupedModules = groupBy(pricingModules, 'module');
 
   if (loading) {
     return (
-      <div className="container mx-auto p-6 max-w-6xl">
+      <div className="container mx-auto p-6 max-w-7xl">
         <Card>
           <CardHeader>
             <Skeleton className="h-8 w-1/3" />
@@ -146,76 +103,48 @@ const Dashboard = () => {
   }
 
   return (
-    <div className="container mx-auto p-6 max-w-6xl">
+    <div className="container mx-auto p-6 max-w-7xl">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold">Pricing Calculator Dashboard</h1>
+        <h1 className="text-3xl font-bold text-[#F97316]">inploi Pricing Calculator</h1>
         <Button onClick={handleSignOut} variant="outline">Sign Out</Button>
       </div>
 
-      <div className="grid gap-6">
-        {profile?.is_admin && (
+      <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
+        {/* Pricing Module Selection Area */}
+        <div className="md:col-span-8">
           <Card>
-            <CardHeader>
-              <CardTitle>Import Pricing Modules (Admin Only)</CardTitle>
+            <CardHeader className="pb-0">
+              <CardTitle>Create Your Quote</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
-                <Textarea
-                  placeholder="Paste CSV data here: module,feature,unit,monthly_price,increment,release_stage"
-                  value={csvData}
-                  onChange={(e) => setCsvData(e.target.value)}
-                  rows={6}
-                />
-                <Button 
-                  onClick={handleUploadCSV}
-                  disabled={uploading}
-                >
-                  {uploading ? 'Uploading...' : 'Upload CSV'}
-                </Button>
+              <div className="grid grid-cols-12 py-4 font-semibold text-sm text-muted-foreground border-b">
+                <div className="col-span-6">MODULE</div>
+                <div className="col-span-3">MONTHLY PRICE</div>
+                <div className="col-span-3">QUANTITY</div>
               </div>
+              
+              <ScrollArea className="h-[calc(100vh-220px)] pr-4">
+                {Object.entries(groupedModules).map(([moduleName, features]) => (
+                  <ModuleGroup
+                    key={moduleName}
+                    moduleName={moduleName}
+                    features={features}
+                    quantities={quantities}
+                    onChange={handleQuantityChange}
+                  />
+                ))}
+              </ScrollArea>
             </CardContent>
           </Card>
-        )}
+        </div>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Pricing Modules</CardTitle>
-          </CardHeader>
-          <CardContent>
-            {pricingModules.length > 0 ? (
-              <div className="overflow-x-auto">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Module</TableHead>
-                      <TableHead>Feature</TableHead>
-                      <TableHead>Unit</TableHead>
-                      <TableHead>Price</TableHead>
-                      <TableHead>Increment</TableHead>
-                      <TableHead>Release Stage</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {pricingModules.map((module) => (
-                      <TableRow key={module.id}>
-                        <TableCell>{module.module}</TableCell>
-                        <TableCell>{module.feature}</TableCell>
-                        <TableCell>{module.unit}</TableCell>
-                        <TableCell>${module.monthly_price.toFixed(2)}</TableCell>
-                        <TableCell>{module.increment}</TableCell>
-                        <TableCell>{module.release_stage}</TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </div>
-            ) : (
-              <div className="text-center py-4 text-muted-foreground">
-                No pricing modules found.
-              </div>
-            )}
-          </CardContent>
-        </Card>
+        {/* Quote Summary */}
+        <div className="md:col-span-4">
+          <QuoteSummary
+            selectedModules={pricingModules}
+            quantities={quantities}
+          />
+        </div>
       </div>
     </div>
   );
