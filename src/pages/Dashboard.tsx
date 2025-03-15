@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -8,24 +7,7 @@ import { toast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { Textarea } from "@/components/ui/textarea";
 import { Skeleton } from "@/components/ui/skeleton";
-
-// Type for user profile
-interface Profile {
-  id: string;
-  full_name: string | null;
-  is_admin: boolean;
-}
-
-// Type for pricing module
-interface PricingModule {
-  id: string;
-  module: string;
-  feature: string;
-  unit: string;
-  monthly_price: number;
-  increment: number;
-  release_stage: string;
-}
+import { Profile, PricingModule } from "@/types/databaseTypes";
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -56,7 +38,7 @@ const Dashboard = () => {
         .single();
 
       if (error) throw error;
-      setProfile(data);
+      setProfile(data as Profile);
     } catch (error: any) {
       console.error('Error checking user:', error.message);
     } finally {
@@ -73,7 +55,7 @@ const Dashboard = () => {
         .order('feature');
 
       if (error) throw error;
-      setPricingModules(data || []);
+      setPricingModules(data as PricingModule[] || []);
     } catch (error: any) {
       console.error('Error fetching pricing modules:', error.message);
       toast({
