@@ -6,7 +6,7 @@ import { ChevronRight, ArrowDown, Sparkles } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const Hero = () => {
-  const { ref, isInView } = useInView();
+  const { ref: inViewRef, isInView } = useInView();
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const heroRef = useRef<HTMLDivElement>(null);
   
@@ -79,7 +79,7 @@ const Hero = () => {
               isInView ? "opacity-100 transform-none" : "opacity-0 translate-y-6",
               "transition-all duration-700 delay-150 ease-out"
             )}
-            ref={ref}
+            ref={inViewRef as React.RefObject<HTMLHeadingElement>}
           >
             Create Beautiful Experiences With Minimal Design
           </h1>

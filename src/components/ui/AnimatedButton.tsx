@@ -15,6 +15,7 @@ interface AnimatedButtonProps {
   iconPosition?: 'left' | 'right';
   fullWidth?: boolean;
   disabled?: boolean;
+  type?: 'button' | 'submit' | 'reset';
 }
 
 const AnimatedButton = ({
@@ -30,6 +31,7 @@ const AnimatedButton = ({
   iconPosition = 'right',
   fullWidth = false,
   disabled = false,
+  type = 'button',
 }: AnimatedButtonProps) => {
   const [isHovering, setIsHovering] = useState(false);
   
@@ -69,7 +71,7 @@ const AnimatedButton = ({
     disabled,
     onMouseEnter: handleMouseEnter,
     onMouseLeave: handleMouseLeave,
-    type: Component === 'button' ? 'button' : undefined,
+    type: Component === 'button' ? type : undefined,
   };
   
   return (
