@@ -96,6 +96,20 @@ serve(async (req) => {
       })
     }
 
+    // Before inserting new records, delete all existing ones
+    const { error: deleteError } = await supabaseClient
+      .from('pricing_modules')
+      .delete()
+      .neq('id', 0) // Delete all records
+
+    if (deleteError) {
+      console.error('Database deletion error:', deleteError)
+      return new Response(
+        JSON.stringify({ error: 'Failed to clear existing data', details: deleteError.message }),
+        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      )
+    }
+
     // Insert data into Supabase
     const { error: insertError } = await supabaseClient
       .from('pricing_modules')
