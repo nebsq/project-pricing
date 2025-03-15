@@ -1,4 +1,3 @@
-
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 import { parse } from 'https://esm.sh/csv-parse@5.5.0/sync'
@@ -15,42 +14,32 @@ serve(async (req) => {
   }
 
   try {
-    // Create Supabase client
+    // 1) Create Supabase client WITHOUT forcing Authorization header
+    //    i.e., don't do { Authorization: req.headers.get('Authorization')! }
     const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_ANON_KEY') ?? '',
       {
-        global: {
-          headers: { Authorization: req.headers.get('Authorization')! },
-        },
+        // Optionally pass along all headers, or skip entirely
+        // global: {
+        //   headers: { ...req.headers },
+        // },
       }
     )
-    
-    // Get user data to verify admin status
-    const {
-      data: { user },
-    } = await supabaseClient.auth.getUser()
 
-    if (!user) {
-      return new Response(
-        JSON.stringify({ error: 'Unauthorized - not logged in' }),
-        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      )
-    }
+    // 2) If you *truly* don't want any login checks, remove user checks entirely:
+    //
+    //    const { data: { user } } = await supabaseClient.auth.getUser()
+    //    if (!user) {
+    //      return new Response(
+    //        JSON.stringify({ error: 'Unauthorized - not logged in' }),
+    //        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+    //      )
+    //    }
+    //
+    //    // Similarly remove the 'is_admin' check if you don't want to restrict calls
 
-    // Check if user is an admin
-    const { data: profileData, error: profileError } = await supabaseClient
-      .from('profiles')
-      .select('is_admin')
-      .eq('id', user.id)
-      .single()
-
-    if (profileError || !profileData || !profileData.is_admin) {
-      return new Response(
-        JSON.stringify({ error: 'Forbidden - admin access required' }),
-        { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      )
-    }
+    // --- Insert your code that processes CSV and inserts into the database ---
 
     // Parse request body as text (CSV content)
     const csvText = await req.text()
@@ -88,12 +77,15 @@ serve(async (req) => {
 
       if (isNaN(monthlyPrice) || isNaN(increment)) {
         return new Response(
-          JSON.stringify({ error: 'Invalid CSV data - monthly_price must be a number and increment must be an integer' }),
+          JSON.stringify({
+            error: 'Invalid CSV data - monthly_price must be a number and increment must be an integer',
+          }),
           { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         )
       }
 
-      // Add validated record
+      // Insert a placeholder for created_by if you still want it:
+      // created_by: user ? user.id : null,
       validRecords.push({
         module: record.module,
         feature: record.feature,
@@ -101,7 +93,6 @@ serve(async (req) => {
         monthly_price: monthlyPrice,
         increment: increment,
         release_stage: record.release_stage,
-        created_by: user.id
       })
     }
 
@@ -122,6 +113,7 @@ serve(async (req) => {
       JSON.stringify({ message: 'Data inserted successfully', count: validRecords.length }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     )
+
   } catch (error) {
     console.error('Unexpected error:', error)
     return new Response(
