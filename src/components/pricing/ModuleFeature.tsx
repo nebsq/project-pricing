@@ -35,7 +35,7 @@ const ModuleFeature = ({ feature, quantity, onChange }: ModuleFeatureProps) => {
           value={quantity || ''} // Use empty string when quantity is 0
           onChange={handleChange}
           className="w-24 text-right"
-          placeholder="-"
+          placeholder=""
         />
       </div>
       {quantity > 0 && (
