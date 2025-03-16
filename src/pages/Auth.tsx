@@ -42,8 +42,7 @@ const Auth = () => {
         });
 
         if (error) throw error;
-        toast({
-          title: "Success!",
+        toast.success("Success!", {
           description: "Check your email for the confirmation link.",
         });
       } else {
@@ -55,11 +54,9 @@ const Auth = () => {
         if (error) throw error;
         navigate('/dashboard');
       }
-    } catch (error: any) {
-      toast({
-        title: "Error",
-        description: error.message,
-        variant: "destructive"
+    } catch (error: unknown) {
+      toast.error("Error", {
+        description: error instanceof Error ? error.message : 'An error occurred'
       });
     } finally {
       setLoading(false);
@@ -77,8 +74,8 @@ const Auth = () => {
       });
 
       if (error) throw error;
-    } catch (error: any) {
-      toast.error(error.message);
+    } catch (error: unknown) {
+      toast.error(error instanceof Error ? error.message : 'An error occurred');
     } finally {
       setLoading(false);
     }
