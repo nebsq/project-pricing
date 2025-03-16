@@ -177,18 +177,20 @@ const Dashboard = () => {
         .from('quotes')
         .upsert(quoteData, { 
           onConflict: 'id'
-        });
+        })
+        .select('quotes'); // Use table name instead of '*'
 
       if (quoteError) throw quoteError;
       
       let quoteId = currentQuote?.id;
       
       if (!quoteId && data) {
-        if (Array.isArray(data) && data.length > 0) {
-          quoteId = data[0].id;
+        const insertedData = data as unknown as Quote[]; // Add type assertion
+        if (insertedData.length > 0) {
+          quoteId = insertedData[0].id;
         }
       }
-      
+
       if (!quoteId) {
         throw new Error("Failed to create quote");
       }
