@@ -2,6 +2,12 @@ import { useState, useRef, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { toast } from "sonner"
 import { cn } from "@/lib/utils"
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip"
 
 export function HoldButton() {
   const [isHolding, setIsHolding] = useState(false)
@@ -63,35 +69,46 @@ export function HoldButton() {
   }, [])
 
   return (
-    <div className="relative">
-      <Button
-        variant="outline"
-        size="sm"
-        className={cn(
-          "relative min-w-[180px] transition-all duration-200",
-          isHolding && "bg-accent"
-        )}
-        onMouseDown={startHolding}
-        onMouseUp={resetButton}
-        onMouseLeave={resetButton}
-        onTouchStart={startHolding}
-        onTouchEnd={resetButton}
-        disabled={isDisabled}
-      >
-        {isDisabled
-          ? "Please wait 1 minute"
-          : isHolding
-          ? "Hold to confirm..."
-          : "Get latest pricing"}
-      </Button>
-      {isHolding && (
-        <div className="absolute left-0 bottom-0 w-full h-0.5 bg-gray-200 rounded-full overflow-hidden">
-          <div
-            className="h-full bg-primary transition-all duration-100 ease-linear"
-            style={{ width: `${progress}%` }}
-          />
-        </div>
-      )}
-    </div>
+    <TooltipProvider>
+      <Tooltip delayDuration={300}>
+        <TooltipTrigger asChild>
+          <div className="relative overflow-hidden">
+            <Button
+              variant="outline"
+              size="sm"
+              className={cn(
+                "relative min-w-[180px] transition-colors duration-200",
+                "border-[#FF4D00]/20",
+                isDisabled && "opacity-50 cursor-not-allowed",
+                !isDisabled && "hover:border-[#FF4D00]/40"
+              )}
+              onMouseDown={startHolding}
+              onMouseUp={resetButton}
+              onMouseLeave={resetButton}
+              onTouchStart={startHolding}
+              onTouchEnd={resetButton}
+              disabled={isDisabled}
+            >
+              <span className="relative z-10">
+                {isDisabled
+                  ? "Please wait 1 minute"
+                  : isHolding
+                  ? "Hold to confirm..."
+                  : "Get latest pricing"}
+              </span>
+              {isHolding && (
+                <div 
+                  className="absolute inset-0 bg-[#FF4D00]/10 transition-transform duration-[3000ms] ease-linear origin-left"
+                  style={{ transform: `scaleX(${progress / 100})` }}
+                />
+              )}
+            </Button>
+          </div>
+        </TooltipTrigger>
+        <TooltipContent className="max-w-[200px] text-xs">
+          Maximum 1 time per minute. This is an expensive operation.
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
   )
 }
