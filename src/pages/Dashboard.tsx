@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -166,8 +165,8 @@ const Dashboard = () => {
 
       if (quoteError) throw quoteError;
       
-      // Fixed: Add a null check for data
-      const quoteId = currentQuote?.id || (data && data[0]?.id);
+      // Fixed: Add proper type checking for data
+      const quoteId = currentQuote?.id || (data && data.length > 0 ? data[0].id : null);
       
       if (!quoteId) {
         throw new Error("Failed to create quote");
