@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { 
   Sidebar, 
   SidebarContent, 
@@ -40,6 +40,11 @@ export function AppSidebar({
   const [quotes, setQuotes] = useState<Quote[]>([]);
   const [loading, setLoading] = useState(false);
   const [selectedQuoteId, setSelectedQuoteId] = useState<string | null>(null);
+  const [isHolding, setIsHolding] = useState(false);
+  const [progress, setProgress] = useState(0);
+  const [isDisabled, setIsDisabled] = useState(false);
+  const holdTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const progressIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const navigate = useNavigate();
   const { state } = useSidebar();
   const isCollapsed = state === "collapsed";
@@ -86,6 +91,38 @@ export function AppSidebar({
     "group-hover:[&>svg]:text-orange-600/70" // Icon color on hover
   );
 
+  const startHolding = () => {
+    if (isDisabled) return;
+    
+    setIsHolding(true);
+    setProgress(0);
+
+    holdTimerRef.current = setTimeout(async () => {
+      await onRefreshPricing();
+      resetButton();
+      setIsDisabled(true);
+      setTimeout(() => setIsDisabled(false), 60000); // 1-minute cooldown
+    }, 3000); // 3 second hold time
+
+    progressIntervalRef.current = setInterval(() => {
+      setProgress(prev => Math.min(prev + (100 / 30), 100));
+    }, 100);
+  };
+
+  const resetButton = () => {
+    setIsHolding(false);
+    setProgress(0);
+    if (holdTimerRef.current) clearTimeout(holdTimerRef.current);
+    if (progressIntervalRef.current) clearInterval(progressIntervalRef.current);
+  };
+
+  useEffect(() => {
+    return () => {
+      if (holdTimerRef.current) clearTimeout(holdTimerRef.current);
+      if (progressIntervalRef.current) clearInterval(progressIntervalRef.current);
+    };
+  }, []);
+
   return (
     <Sidebar variant="sidebar" collapsible="icon">
       <SidebarHeader className="p-4">
@@ -94,14 +131,13 @@ export function AppSidebar({
             <img 
               src={inploiLogomark} 
               alt="inploi" 
-              className="h-8 w-8" 
-              // Remove imageRendering and transform-gpu as SVGs scale perfectly
+              className="h-7 w-auto" // Changed from fixed width to auto to maintain aspect ratio
             />
           ) : (
             <img 
               src={inploiFullLogo} 
               alt="inploi" 
-              className="h-8"
+              className="h-8 w-auto" // Added w-auto for consistency
             />
           )}
         </div>
@@ -115,12 +151,36 @@ export function AppSidebar({
             {!isCollapsed && <span>New Quote</span>}
           </SidebarMenuButton>
           <SidebarMenuButton
-            onClick={onRefreshPricing}
-            tooltip="Get Latest Pricing"
-            className={buttonStyles}
+            onClick={() => {}} // Empty onClick as we're using mouse events
+            onMouseDown={startHolding}
+            onMouseUp={resetButton}
+            onMouseLeave={resetButton}
+            onTouchStart={startHolding}
+            onTouchEnd={resetButton}
+            disabled={isDisabled}
+            tooltip={isDisabled ? "Please wait 1 minute" : "Hold to update pricing"}
+            className={cn(
+              buttonStyles,
+              "relative overflow-hidden",
+              isDisabled && "opacity-50 cursor-not-allowed"
+            )}
           >
-            <RotateCcw className="h-4 w-4" />
-            {!isCollapsed && <span>Get Latest Pricing</span>}
+            <RotateCcw className="h-4 w-4 text-muted-foreground" />
+            {!isCollapsed && (
+              <span>
+                {isDisabled
+                  ? "Please wait 1 minute"
+                  : isHolding
+                  ? "Hold to confirm..."
+                  : "Get Latest Pricing"}
+              </span>
+            )}
+            {isHolding && (
+              <div 
+                className="absolute inset-0 bg-orange-500/10 transition-transform duration-[3000ms] ease-linear origin-left"
+                style={{ transform: `scaleX(${progress / 100})` }}
+              />
+            )}
           </SidebarMenuButton>
         </div>
       </SidebarHeader>
