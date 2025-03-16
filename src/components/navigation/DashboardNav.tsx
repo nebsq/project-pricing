@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button"
 import { HoldButton } from "@/components/ui/hold-button"
 import { useNavigate } from "react-router-dom"
-import inploiLogo from "@/assets/inploi-full-logo-primary (1).png"
+import inploiLogo from "@/assets/inploi-logo.png"
 
 interface DashboardNavProps {
   onSignOut: () => Promise<void>
