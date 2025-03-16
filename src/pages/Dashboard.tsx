@@ -31,7 +31,24 @@ const Dashboard = () => {
       if (!user) {
         navigate('/auth');
       } else {
-        setProfile(user);
+        const { data: profileData, error } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', user.id)
+          .single();
+        
+        if (error) {
+          console.error('Error fetching profile:', error.message);
+          setProfile({
+            id: user.id,
+            full_name: user.user_metadata.full_name || null,
+            is_admin: false,
+            created_at: user.created_at,
+            updated_at: user.updated_at || user.created_at,
+          });
+        } else {
+          setProfile(profileData as Profile);
+        }
       }
     } catch (error: any) {
       console.error('Error checking user:', error.message);
@@ -106,7 +123,6 @@ const Dashboard = () => {
       <div className="min-h-screen bg-[#F9F8F4]">
         <div className="container mx-auto p-6 max-w-7xl pt-20">
           <div className="space-y-6">
-            {/* Title Section */}
             <div className="flex justify-between items-center">
               <h1 className="text-3xl font-bold text-[#F97316] font-display tracking-tight">
                 <span className="bg-gradient-to-r from-[#F97316] to-[#FF9A3C] bg-clip-text text-transparent">
@@ -115,10 +131,8 @@ const Dashboard = () => {
               </h1>
             </div>
 
-            {/* Grid Section */}
             <div className="grid grid-cols-1 md:grid-cols-12 gap-8">
               <div className="md:col-span-8">
-                {/* About Section */}
                 <div className="bg-white/50 backdrop-blur-sm rounded-lg border border-[#FF4D00]/10 p-6 mb-8">
                   <h2 className="text-lg font-semibold text-[#FF4D00]/90 mb-2">
                     About
@@ -131,19 +145,16 @@ const Dashboard = () => {
                   </p>
                   <p className="text-muted-foreground">
                     <strong>Things to do:</strong>
-                    <ul className="list-disc list-inside mt-2">
-                      <li>Enable saving quotes so they are not lost.</li>
-                      <li>Enable copying or exporting the "Quote Summary" for use in other docs.</li>
-                      <ul className="list-disc list-inside ml-4">
-                        <li>Discovery needed - what do we want here? What format is useful? .pdf? Slick copy+paste?</li>
-                      </ul>
-                      <li>Unclear if pricing versions are required. Needs scoping.</li>
-                      <li>More to come?</li>
-                    </ul>
                   </p>
+                  <ul className="list-disc list-inside mt-2 text-muted-foreground">
+                    <li>Enable saving quotes so they are not lost.</li>
+                    <li>Enable copying or exporting the "Quote Summary" for use in other docs.</li>
+                    <li className="ml-4">Discovery needed - what do we want here? What format is useful? .pdf? Slick copy+paste?</li>
+                    <li>Unclear if pricing versions are required. Needs scoping.</li>
+                    <li>More to come?</li>
+                  </ul>
                 </div>
 
-                {/* Create Quote Section */}
                 <div className="mb-8">
                   <h2 className="text-2xl font-display font-semibold tracking-tight">
                     Create your quote
@@ -154,7 +165,6 @@ const Dashboard = () => {
                   </p>
                 </div>
 
-                {/* Module Groups */}
                 <div className="space-y-6">
                   {Object.entries(groupedModules).map(([moduleName, features]) => (
                     <ModuleGroup
@@ -166,7 +176,6 @@ const Dashboard = () => {
                     />
                   ))}
                   
-                  {/* Implementation & Others Section */}
                   <ImplementationSection 
                     implementationFee={implementationFee}
                     annualDiscount={annualDiscount}
@@ -176,7 +185,6 @@ const Dashboard = () => {
                 </div>
               </div>
 
-              {/* Quote Summary */}
               <div className="md:col-span-4">
                 <div className="sticky top-24">
                   <QuoteSummary
