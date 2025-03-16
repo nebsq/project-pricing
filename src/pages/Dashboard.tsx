@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -147,7 +148,7 @@ const Dashboard = () => {
         return;
       }
 
-      // First, insert the quote - FIX: Changed the upsert structure and options
+      // First, insert the quote
       const quoteData = {
         id: currentQuote?.id,
         profile_id: profile.id,
@@ -165,8 +166,8 @@ const Dashboard = () => {
 
       if (quoteError) throw quoteError;
       
-      // FIX: Safely handle the possibly null data from Supabase
-      const quoteId = currentQuote?.id || data?.[0]?.id;
+      // Fixed: Add a null check for data
+      const quoteId = currentQuote?.id || (data && data[0]?.id);
       
       if (!quoteId) {
         throw new Error("Failed to create quote");
@@ -199,7 +200,7 @@ const Dashboard = () => {
 
       if (itemsError) throw itemsError;
 
-      // Set current quote - FIX: Handle possibly null data
+      // Set current quote with null checks
       setCurrentQuote({
         id: quoteId,
         profile_id: profile.id,

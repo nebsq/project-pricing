@@ -8,8 +8,8 @@ import {
   SidebarMenuItem, 
   SidebarMenuButton,
   SidebarFooter,
+  useSidebar
 } from "@/components/ui/sidebar";
-import { HoldButton } from "@/components/ui/hold-button";
 import { Button } from "@/components/ui/button";
 import { FilePlus, FileText, RotateCcw, LogOut, Home } from "lucide-react";
 import { useNavigate } from 'react-router-dom';
@@ -17,6 +17,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Quote } from "@/types/databaseTypes";
 import { toast } from "sonner";
 import inploiLogo from "@/assets/inploi-logo.png";
+import inploiIcon from "@/assets/lovable-uploads/854e1981-63f6-4d6f-9c0e-2ca57610672e.png";
 import { formatDistanceToNow } from 'date-fns';
 import { ScrollArea } from "@/components/ui/scroll-area";
 
@@ -38,6 +39,8 @@ export function AppSidebar({
   const [quotes, setQuotes] = useState<Quote[]>([]);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const { state } = useSidebar();
+  const isCollapsed = state === "collapsed";
 
   useEffect(() => {
     if (profileId) {
@@ -66,28 +69,32 @@ export function AppSidebar({
   };
 
   return (
-    <Sidebar>
+    <Sidebar variant="sidebar" collapsible="icon">
       <SidebarHeader className="p-4">
-        <div className="flex items-center mb-6">
-          <img src={inploiLogo} alt="inploi logo" className="h-8" />
+        <div className="flex items-center mb-6 justify-center">
+          {isCollapsed ? (
+            <img src={inploiIcon} alt="inploi icon" className="h-8 w-8" />
+          ) : (
+            <img src={inploiLogo} alt="inploi logo" className="h-8" />
+          )}
         </div>
         <div className="space-y-2">
-          <Button 
-            variant="outline" 
-            className="w-full justify-start" 
+          <SidebarMenuButton 
             onClick={onCreateNew}
-          >
-            <FilePlus className="mr-2 h-4 w-4" />
-            New Quote
-          </Button>
-          <Button 
-            variant="outline" 
+            tooltip="New Quote"
             className="w-full justify-start"
-            onClick={onRefreshPricing}
           >
-            <RotateCcw className="mr-2 h-4 w-4" />
-            Get Latest Pricing
-          </Button>
+            <FilePlus className="h-4 w-4" />
+            <span>New Quote</span>
+          </SidebarMenuButton>
+          <SidebarMenuButton
+            onClick={onRefreshPricing}
+            tooltip="Get Latest Pricing"
+            className="w-full justify-start"
+          >
+            <RotateCcw className="h-4 w-4" />
+            <span>Get Latest Pricing</span>
+          </SidebarMenuButton>
         </div>
       </SidebarHeader>
       
@@ -105,11 +112,12 @@ export function AppSidebar({
                   <SidebarMenuItem key={quote.id}>
                     <SidebarMenuButton 
                       onClick={() => onQuoteSelect(quote.id)}
+                      tooltip={quote.name}
                       className="w-full justify-start"
                     >
-                      <FileText className="mr-2 h-4 w-4" />
+                      <FileText className="h-4 w-4" />
                       <div className="flex flex-col items-start">
-                        <span className="font-medium">{quote.name}</span>
+                        <span className="font-medium truncate w-full max-w-[150px]">{quote.name}</span>
                         <span className="text-xs text-muted-foreground">
                           {formatDistanceToNow(new Date(quote.updated_at), { addSuffix: true })}
                         </span>
@@ -128,22 +136,22 @@ export function AppSidebar({
       </SidebarContent>
       
       <SidebarFooter className="p-4">
-        <Button
-          variant="outline"
-          className="w-full justify-start"
+        <SidebarMenuButton
           onClick={() => navigate('/')}
+          tooltip="Home"
+          className="w-full justify-start mb-2"
         >
-          <Home className="mr-2 h-4 w-4" />
-          Home
-        </Button>
-        <Button
-          variant="outline"
-          className="w-full justify-start mt-2"
+          <Home className="h-4 w-4" />
+          <span>Home</span>
+        </SidebarMenuButton>
+        <SidebarMenuButton
           onClick={onSignOut}
+          tooltip="Sign out"
+          className="w-full justify-start"
         >
-          <LogOut className="mr-2 h-4 w-4" />
-          Sign out
-        </Button>
+          <LogOut className="h-4 w-4" />
+          <span>Sign out</span>
+        </SidebarMenuButton>
       </SidebarFooter>
     </Sidebar>
   );
