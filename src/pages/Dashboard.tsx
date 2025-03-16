@@ -50,8 +50,8 @@ const Dashboard = () => {
           setProfile(profileData as Profile);
         }
       }
-    } catch (error: any) {
-      console.error('Error checking user:', error.message);
+    } catch (error: Error | unknown) {
+      console.error('Error checking user:', error instanceof Error ? error.message : 'Unknown error');
     } finally {
       setLoading(false);
     }
@@ -67,8 +67,8 @@ const Dashboard = () => {
 
       if (error) throw error;
       setPricingModules(data as PricingModule[] || []);
-    } catch (error: any) {
-      console.error('Error fetching pricing modules:', error.message);
+    } catch (error: Error | unknown) {
+      console.error('Error fetching pricing modules:', error instanceof Error ? error.message : 'Unknown error');
       toast.error("Failed to load pricing modules");
     }
   };
