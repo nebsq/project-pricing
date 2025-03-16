@@ -1,4 +1,9 @@
-import * as React from "react"
+rm src/components/ui/sidebar.tsx        # Already identified
+rm src/components/ui/sheet.tsx          # Only used by sidebar
+rm src/components/ui/aspect-ratio.tsx   # Not used anywhere
+rm src/components/ui/accordion.tsx      # Not used in your pricing calculator
+rm src/components/ui/alert-dialog.tsx   # Not used for any confirmations
+rm src/components/ui/alert.tsx          # Not used for any notifications (you use Sonner)import * as React from "react"
 import { Slot } from "@radix-ui/react-slot"
 import { VariantProps, cva } from "class-variance-authority"
 import { PanelLeft } from "lucide-react"
