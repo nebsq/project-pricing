@@ -133,9 +133,12 @@ const Dashboard = () => {
 
             <div className="grid grid-cols-1 md:grid-cols-12 gap-8">
               <div className="md:col-span-8">
+                {/* About Section */}
                 <div className="bg-white/50 backdrop-blur-sm rounded-lg border border-[#FF4D00]/10 p-6 mb-8">
-                  <h2 className="text-lg font-semibold text-[#FF4D00]/90 mb-2">
-                    About
+                  <h2 className="text-xl font-semibold font-display tracking-tight mb-4">
+                    <span className="bg-gradient-to-r from-[#F97316] to-[#FF9A3C] bg-clip-text text-transparent">
+                      About
+                    </span>
                   </h2>
                   <p className="text-muted-foreground">
                     This calculator reads the line items and values directly from the 'Pricing' google sheet.
@@ -146,7 +149,9 @@ const Dashboard = () => {
                   <p className="text-muted-foreground">
                     <strong>Things to do:</strong>
                   </p>
-                  <ul className="list-disc list-inside mt-2 text-muted-foreground">
+                  
+                    <ul className="list-disc list-inside mt-2 text-muted-foreground">
+                    <li>Do we want the LINE ITEMS in the quote summary with monthyl or annual prices?</li>
                     <li>Enable saving quotes so they are not lost.</li>
                     <li>Enable copying or exporting the "Quote Summary" for use in other docs.</li>
                     <li className="ml-4">Discovery needed - what do we want here? What format is useful? .pdf? Slick copy+paste?</li>
