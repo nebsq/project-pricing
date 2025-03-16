@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -148,27 +147,26 @@ const Dashboard = () => {
         return;
       }
 
-      // First, insert the quote
-      const { data: quoteData, error: quoteError } = await supabase
+      // First, insert the quote - FIX: Changed the upsert structure and options
+      const quoteData = {
+        id: currentQuote?.id,
+        profile_id: profile.id,
+        name,
+        implementation_fee: implementationFee,
+        annual_discount: annualDiscount,
+        updated_at: new Date().toISOString()
+      };
+
+      const { data, error: quoteError } = await supabase
         .from('quotes')
-        .upsert([
-          {
-            id: currentQuote?.id,
-            profile_id: profile.id,
-            name,
-            implementation_fee: implementationFee,
-            annual_discount: annualDiscount,
-            updated_at: new Date().toISOString()
-          }
-        ], 
-        { 
-          onConflict: 'id',
-          returning: 'representation'
+        .upsert(quoteData, { 
+          onConflict: 'id'
         });
 
       if (quoteError) throw quoteError;
       
-      const quoteId = quoteData?.[0]?.id;
+      // FIX: Safely handle the possibly null data from Supabase
+      const quoteId = currentQuote?.id || data?.[0]?.id;
       
       if (!quoteId) {
         throw new Error("Failed to create quote");
@@ -201,15 +199,15 @@ const Dashboard = () => {
 
       if (itemsError) throw itemsError;
 
-      // Set current quote
+      // Set current quote - FIX: Handle possibly null data
       setCurrentQuote({
         id: quoteId,
         profile_id: profile.id,
         name,
         implementation_fee: implementationFee,
         annual_discount: annualDiscount,
-        created_at: quoteData[0].created_at,
-        updated_at: quoteData[0].updated_at
+        created_at: currentQuote?.created_at || new Date().toISOString(),
+        updated_at: new Date().toISOString()
       });
 
       toast.success(`Quote "${name}" saved successfully`);
