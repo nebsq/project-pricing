@@ -144,7 +144,7 @@ const Dashboard = () => {
                     This calculator reads the line items and values directly from the 'Pricing' google sheet.
                   </p>
                   <p className="text-muted-foreground mb-4">
-                    Only items with <strong>release_stage = Available (General) </strong>are imported.
+                    Only items with column <code className="px-1.5 py-0.5 rounded bg-[#FF4D00]/5 text-[#FF4D00] font-mono text-sm font-medium border border-[#FF4D00]/10">release_stage = Available (General)</code> are imported.
                   </p>
                   <p className="text-muted-foreground">
                     <strong>Things to do:</strong>
