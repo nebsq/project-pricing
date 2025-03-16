@@ -165,8 +165,16 @@ const Dashboard = () => {
 
       if (quoteError) throw quoteError;
       
-      // Fixed: Add proper type checking for data
-      const quoteId = currentQuote?.id || (data && data.length > 0 ? data[0].id : null);
+      // Fixed: Properly handle potentially undefined or null data
+      let quoteId = currentQuote?.id;
+      
+      if (!quoteId && data) {
+        // Use type assertion to handle the Supabase response type
+        const responseData = data as any[];
+        if (responseData.length > 0) {
+          quoteId = responseData[0].id;
+        }
+      }
       
       if (!quoteId) {
         throw new Error("Failed to create quote");
