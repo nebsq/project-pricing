@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { 
   Sidebar, 
@@ -17,7 +16,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Quote } from "@/types/databaseTypes";
 import { toast } from "sonner";
 import inploiLogo from "@/assets/inploi-logo.png";
-import inploiIcon from "@/assets/lovable-uploads/854e1981-63f6-4d6f-9c0e-2ca57610672e.png";
+import inploiIcon from "/lovable-uploads/854e1981-63f6-4d6f-9c0e-2ca57610672e.png";
 import { formatDistanceToNow } from 'date-fns';
 import { ScrollArea } from "@/components/ui/scroll-area";
 
