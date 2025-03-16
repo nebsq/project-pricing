@@ -41,23 +41,42 @@ const Dashboard = () => {
           .from('profiles')
           .select('*')
           .eq('id', user.id)
-          .single();
+          .maybeSingle();
         
-        if (error) {
+        if (error && error.code !== 'PGRST116') {
           console.error('Error fetching profile:', error.message);
-          setProfile({
+          throw error;
+        }
+
+        if (!profileData) {
+          const newProfile: Profile = {
             id: user.id,
-            full_name: user.user_metadata.full_name || null,
+            full_name: user.user_metadata.full_name || user.email?.split('@')[0] || 'User',
             is_admin: false,
             created_at: user.created_at,
             updated_at: user.updated_at || user.created_at,
-          });
+          };
+
+          const { error: insertError } = await supabase
+            .from('profiles')
+            .insert(newProfile);
+
+          if (insertError) {
+            console.error('Error creating profile:', insertError.message);
+            throw insertError;
+          }
+
+          setProfile(newProfile);
+          toast.success("Profile created successfully");
         } else {
           setProfile(profileData as Profile);
         }
       }
     } catch (error: Error | unknown) {
       console.error('Error checking user:', error instanceof Error ? error.message : 'Unknown error');
+      toast.error("Error fetching profile. Please try logging in again.");
+      await supabase.auth.signOut();
+      navigate('/auth');
     } finally {
       setLoading(false);
     }
@@ -120,7 +139,6 @@ const Dashboard = () => {
       }
       
       toast.success("Pricing refresh triggered successfully");
-      // Refresh pricing modules after a short delay to allow the backend to update
       setTimeout(() => fetchPricingModules(), 2000);
     } catch (error) {
       console.error('Error refreshing pricing:', error);
@@ -137,7 +155,6 @@ const Dashboard = () => {
     setIsSaving(true);
     
     try {
-      // Get selected items
       const selectedItems = pricingModules.filter(
         module => quantities[module.id] && quantities[module.id] > 0
       );
@@ -147,7 +164,6 @@ const Dashboard = () => {
         return;
       }
 
-      // First, insert the quote
       const quoteData = {
         id: currentQuote?.id,
         profile_id: profile.id,
@@ -165,14 +181,11 @@ const Dashboard = () => {
 
       if (quoteError) throw quoteError;
       
-      // Fixed: Properly handle potentially undefined or null data
       let quoteId = currentQuote?.id;
       
       if (!quoteId && data) {
-        // Use type assertion to handle the Supabase response type
-        const responseData = data as any[];
-        if (responseData.length > 0) {
-          quoteId = responseData[0].id;
+        if (Array.isArray(data) && data.length > 0) {
+          quoteId = data[0].id;
         }
       }
       
@@ -180,7 +193,6 @@ const Dashboard = () => {
         throw new Error("Failed to create quote");
       }
 
-      // If updating an existing quote, first delete all existing items
       if (currentQuote?.id) {
         const { error: deleteError } = await supabase
           .from('quote_items')
@@ -190,7 +202,6 @@ const Dashboard = () => {
         if (deleteError) throw deleteError;
       }
 
-      // Then insert all the quote items
       const quoteItems = selectedItems.map(item => ({
         quote_id: quoteId,
         pricing_module_id: item.id,
@@ -207,7 +218,6 @@ const Dashboard = () => {
 
       if (itemsError) throw itemsError;
 
-      // Set current quote with null checks
       setCurrentQuote({
         id: quoteId,
         profile_id: profile.id,
@@ -220,9 +230,9 @@ const Dashboard = () => {
 
       toast.success(`Quote "${name}" saved successfully`);
       setSaveModalOpen(false);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error saving quote:', error);
-      toast.error("Failed to save quote");
+      toast.error(`Failed to save quote: ${error.message || 'Unknown error'}`);
     } finally {
       setIsSaving(false);
     }
@@ -231,7 +241,6 @@ const Dashboard = () => {
   const loadQuote = async (quoteId: string) => {
     setLoading(true);
     try {
-      // Fetch the quote
       const { data: quoteData, error: quoteError } = await supabase
         .from('quotes')
         .select('*')
@@ -240,7 +249,6 @@ const Dashboard = () => {
 
       if (quoteError) throw quoteError;
 
-      // Fetch the quote items
       const { data: itemsData, error: itemsError } = await supabase
         .from('quote_items')
         .select('*')
@@ -248,17 +256,13 @@ const Dashboard = () => {
 
       if (itemsError) throw itemsError;
 
-      // Set the current quote
       setCurrentQuote(quoteData as Quote);
       
-      // Set implementation fee and annual discount
       setImplementationFee(quoteData.implementation_fee);
       setAnnualDiscount(quoteData.annual_discount);
 
-      // Reset quantities
       const newQuantities: Record<string, number> = {};
       
-      // Set quantities for each item
       itemsData.forEach((item: QuoteItem) => {
         if (item.pricing_module_id) {
           newQuantities[item.pricing_module_id] = item.quantity;
@@ -338,7 +342,6 @@ const Dashboard = () => {
 
             <div className="grid grid-cols-1 md:grid-cols-12 gap-8">
               <div className="md:col-span-8">
-                {/* About Section */}
                 <div className="bg-white/50 backdrop-blur-sm rounded-lg border border-[#FF4D00]/10 p-6 mb-8">
                   <h2 className="text-xl font-semibold font-display tracking-tight mb-4">
                     <span className="bg-gradient-to-r from-[#F97316] to-[#FF9A3C] bg-clip-text text-transparent">
