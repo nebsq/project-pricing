@@ -1,20 +1,27 @@
+
 import { PricingModule } from "@/types/databaseTypes";
 import { formatCurrency } from "@/lib/utils";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import { Button } from "@/components/ui/button";
+import { Save } from "lucide-react";
 
 interface QuoteSummaryProps {
   selectedModules: PricingModule[];
   quantities: Record<string, number>;
   implementationFee: number | null;
   annualDiscount: number | null;
+  onSaveClick: () => void;
+  quoteName?: string;
 }
 
 const QuoteSummary = ({ 
   selectedModules, 
   quantities,
   implementationFee,
-  annualDiscount
+  annualDiscount,
+  onSaveClick,
+  quoteName
 }: QuoteSummaryProps) => {
   // Filter selected modules (those with quantity > 0)
   const selectedItems = selectedModules.filter(
@@ -68,11 +75,11 @@ const QuoteSummary = ({
   return (
     <Card className="shadow-md">
       <CardHeader className="pb-2 bg-white rounded-t-lg border-b">
-        <CardTitle className="text-xl font-bold">
-          Quote Summary
+        <CardTitle className="text-xl font-bold flex justify-between items-center">
+          <span>{quoteName || "Quote Summary"}</span>
         </CardTitle>
       </CardHeader>
-      <CardContent className="pt-4 bg-white rounded-b-lg">
+      <CardContent className="pt-4 bg-white">
         <div className="space-y-6">
           <div className="space-y-2">
             <div className="flex justify-between text-lg">
@@ -142,6 +149,16 @@ const QuoteSummary = ({
           </div>
         </div>
       </CardContent>
+      <CardFooter className="bg-white rounded-b-lg pt-0">
+        <Button 
+          onClick={onSaveClick}
+          className="w-full"
+          disabled={selectedItems.length === 0}
+        >
+          <Save className="mr-2 h-4 w-4" />
+          Save Quote
+        </Button>
+      </CardFooter>
     </Card>
   );
 };

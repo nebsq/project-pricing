@@ -69,6 +69,92 @@ export type Database = {
         }
         Relationships: []
       }
+      quote_items: {
+        Row: {
+          feature: string
+          id: string
+          module: string
+          monthly_price: number
+          pricing_module_id: string | null
+          quantity: number
+          quote_id: string
+          unit: string
+        }
+        Insert: {
+          feature: string
+          id?: string
+          module: string
+          monthly_price: number
+          pricing_module_id?: string | null
+          quantity: number
+          quote_id: string
+          unit: string
+        }
+        Update: {
+          feature?: string
+          id?: string
+          module?: string
+          monthly_price?: number
+          pricing_module_id?: string | null
+          quantity?: number
+          quote_id?: string
+          unit?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "quote_items_pricing_module_id_fkey"
+            columns: ["pricing_module_id"]
+            isOneToOne: false
+            referencedRelation: "pricing_modules"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "quote_items_quote_id_fkey"
+            columns: ["quote_id"]
+            isOneToOne: false
+            referencedRelation: "quotes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      quotes: {
+        Row: {
+          annual_discount: number | null
+          created_at: string
+          id: string
+          implementation_fee: number | null
+          name: string
+          profile_id: string
+          updated_at: string
+        }
+        Insert: {
+          annual_discount?: number | null
+          created_at?: string
+          id?: string
+          implementation_fee?: number | null
+          name: string
+          profile_id: string
+          updated_at?: string
+        }
+        Update: {
+          annual_discount?: number | null
+          created_at?: string
+          id?: string
+          implementation_fee?: number | null
+          name?: string
+          profile_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "quotes_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never

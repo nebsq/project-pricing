@@ -21,3 +21,24 @@ export interface PricingModule {
   created_at: string;
   created_by: string | null;
 }
+
+export interface Quote {
+  id: string;
+  profile_id: string;
+  name: string;
+  created_at: string;
+  updated_at: string;
+  implementation_fee: number | null;
+  annual_discount: number | null;
+}
+
+export interface QuoteItem {
+  id: string;
+  quote_id: string;
+  pricing_module_id: string | null;
+  module: string;
+  feature: string;
+  unit: string;
+  monthly_price: number;
+  quantity: number;
+}
