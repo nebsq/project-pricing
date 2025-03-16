@@ -1,3 +1,4 @@
+
 import { useState, useRef, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { toast } from "sonner"
@@ -8,6 +9,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
+import { supabase } from "@/integrations/supabase/client"
 
 export function HoldButton() {
   const [isHolding, setIsHolding] = useState(false)
@@ -18,55 +20,48 @@ export function HoldButton() {
 
   const triggerPricingUpdate = async () => {
     try {
-      const response = await fetch(
-        "https://hook.eu1.make.com/3kg5xrw94ijqdqgenphdqduxvf7r74dr",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      )
-
-      if (!response.ok) throw new Error("Failed to trigger pricing update")
-      toast.success("Pricing update triggered successfully")
+      const { data, error } = await supabase.functions.invoke('update-pricing');
+      
+      if (error) throw new Error(error.message);
+      
+      toast.success("Pricing update triggered successfully");
     } catch (error) {
-      console.error("Error triggering pricing update:", error)
-      toast.error("Failed to trigger pricing update")
+      console.error("Error triggering pricing update:", error);
+      toast.error("Failed to trigger pricing update");
     }
   }
 
   const startHolding = () => {
-    if (isDisabled) return
+    if (isDisabled) return;
 
-    setIsHolding(true)
-    setProgress(0)
+    setIsHolding(true);
+    setProgress(0);
 
     holdTimerRef.current = setTimeout(async () => {
-      await triggerPricingUpdate()
-      resetButton()
-      setIsDisabled(true)
-      setTimeout(() => setIsDisabled(false), 60000) // 1-minute cooldown
-    }, 3000) // 3 second hold time
+      await triggerPricingUpdate();
+      resetButton();
+      setIsDisabled(true);
+      setTimeout(() => setIsDisabled(false), 60000); // 1-minute cooldown
+    }, 3000); // 3 second hold time
 
     progressIntervalRef.current = setInterval(() => {
-      setProgress(prev => Math.min(prev + (100 / 30), 100))
-    }, 100)
+      setProgress(prev => Math.min(prev + (100 / 30), 100));
+    }, 100);
   }
 
   const resetButton = () => {
-    setIsHolding(false)
-    setProgress(0)
-    if (holdTimerRef.current) clearTimeout(holdTimerRef.current)
-    if (progressIntervalRef.current) clearInterval(progressIntervalRef.current)
+    setIsHolding(false);
+    setProgress(0);
+    if (holdTimerRef.current) clearTimeout(holdTimerRef.current);
+    if (progressIntervalRef.current) clearInterval(progressIntervalRef.current);
   }
 
   useEffect(() => {
     return () => {
-      if (holdTimerRef.current) clearTimeout(holdTimerRef.current)
-      if (progressIntervalRef.current) clearInterval(progressIntervalRef.current)
+      if (holdTimerRef.current) clearTimeout(holdTimerRef.current);
+      if (progressIntervalRef.current) clearInterval(progressIntervalRef.current);
     }
-  }, [])
+  }, []);
 
   return (
     <TooltipProvider>
