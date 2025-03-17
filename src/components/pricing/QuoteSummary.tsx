@@ -83,6 +83,10 @@ const QuoteSummary = ({
         <div className="space-y-6">
           <div className="space-y-2">
             <div className="flex justify-between text-lg">
+              <span>Monthly Cost</span>
+              <span className="font-bold">{formatCurrency(monthlyCost)}</span>
+            </div>
+            <div className="flex justify-between text-lg">
               <span>Annual Cost</span>
               <span className="font-bold">{formatCurrency(monthlyCost * 12)}</span>
             </div>
@@ -112,49 +116,48 @@ const QuoteSummary = ({
                 LINE ITEMS
               </h3>
               <div className="flex text-xs text-muted-foreground">
-                <span className="w-20 text-right">Monthly</span>
-                <span className="w-20 text-right">Annual</span>
+                <span className="w-24 text-right pr-4">Monthly</span>
+                <span className="w-24 text-right">Annual</span>
               </div>
             </div>
             <Separator className="mb-4" />
 
             {Object.keys(groupedItems).length > 0 ? (
               <>
-                {Object.entries(groupedItems).map(([moduleName, items], moduleIndex) => {
-                  // Calculate total quantity for module
-                  const totalModuleQuantity = items.reduce(
-                    (total, item) => total + quantities[item.id], 
-                    0
-                  );
-                  
-                  // Calculate total monthly cost for module
-                  const totalModuleMonthly = items.reduce(
-                    (total, item) => total + item.monthly_price * quantities[item.id],
-                    0
-                  );
-                  
-                  return (
-                    <div key={moduleName} className="mb-4">
-                      <div className="flex justify-between py-1 bg-gray-50 p-2 rounded">
-                        <span className="text-sm font-semibold">
-                          {moduleName} × {totalModuleQuantity}
-                        </span>
-                        <div className="flex space-x-4">
-                          <span className="text-xs font-medium text-gray-700 w-20 text-right">
-                            {formatCurrency(totalModuleMonthly)}
-                          </span>
-                          <span className="text-xs font-medium text-gray-700 w-20 text-right">
-                            {formatCurrency(totalModuleMonthly * 12)}
-                          </span>
-                        </div>
-                      </div>
-                      
-                      {moduleIndex < Object.entries(groupedItems).length - 1 && (
-                        <Separator className="my-3" />
-                      )}
+                {Object.entries(groupedItems).map(([moduleName, items], moduleIndex) => (
+                  <div key={moduleName} className="mb-4">
+                    <div className="py-1 bg-gray-50 p-2 rounded mb-2">
+                      <span className="text-sm font-semibold">
+                        {moduleName}
+                      </span>
                     </div>
-                  );
-                })}
+                    
+                    <div className="pl-2 space-y-1">
+                      {items.map((item) => {
+                        const monthlyPrice = item.monthly_price * quantities[item.id];
+                        return (
+                          <div key={item.id} className="flex justify-between py-1">
+                            <span className="text-xs text-gray-700">
+                              {item.feature} × {quantities[item.id]}
+                            </span>
+                            <div className="flex">
+                              <span className="text-xs font-medium text-gray-700 w-24 text-right pr-4">
+                                {formatCurrency(monthlyPrice)}
+                              </span>
+                              <span className="text-xs font-medium text-gray-700 w-24 text-right">
+                                {formatCurrency(monthlyPrice * 12)}
+                              </span>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                    
+                    {moduleIndex < Object.entries(groupedItems).length - 1 && (
+                      <Separator className="my-3" />
+                    )}
+                  </div>
+                ))}
               </>
             ) : (
               <div className="text-center py-8 text-muted-foreground">
@@ -168,7 +171,7 @@ const QuoteSummary = ({
         <Button 
           onClick={onSaveClick}
           variant="default"
-          className="w-full"
+          className="w-full bg-[#FF6D00] hover:bg-[#FF8C33] text-white"
           disabled={selectedItems.length === 0}
         >
           <Save className="mr-2 h-4 w-4" />
