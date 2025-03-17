@@ -30,6 +30,12 @@ export interface Quote {
   updated_at: string;
   implementation_fee: number | null;
   annual_discount: number | null;
+  ae_csm_name?: string | null;
+  champion_name?: string | null;
+  economic_buyer_name?: string | null;
+  ftes?: number | null;
+  vacancies?: number | null;
+  applications?: number | null;
 }
 
 export interface QuoteItem {

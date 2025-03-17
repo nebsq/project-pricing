@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -160,6 +161,8 @@ const Dashboard = () => {
         toast.error("Cannot save an empty quote");
         return;
       }
+      
+      // Create the quote data object with the correct type
       const quoteData = {
         id: currentQuote?.id,
         profile_id: profile.id,
@@ -183,14 +186,17 @@ const Dashboard = () => {
       }).select();
       
       if (quoteError) throw quoteError;
+      
       let quoteId = currentQuote?.id;
       if (!quoteId && data && data.length > 0) {
         quoteId = data[0].id;
       }
+      
       if (!quoteId) {
         throw new Error("Failed to create quote");
       }
       
+      // If we're updating an existing quote, delete all its items first
       if (currentQuote?.id) {
         const {
           error: deleteError
@@ -198,6 +204,7 @@ const Dashboard = () => {
         if (deleteError) throw deleteError;
       }
       
+      // Create quote items
       const quoteItems = selectedItems.map(item => ({
         quote_id: quoteId,
         pricing_module_id: item.id,
@@ -213,21 +220,38 @@ const Dashboard = () => {
       } = await supabase.from('quote_items').insert(quoteItems);
       if (itemsError) throw itemsError;
       
-      setCurrentQuote({
-        id: quoteId,
-        profile_id: profile.id,
-        name,
-        implementation_fee: implementationFee,
-        annual_discount: annualDiscount,
-        ae_csm_name: aeCsmName,
-        champion_name: championName,
-        economic_buyer_name: economicBuyerName,
-        ftes: ftes,
-        vacancies: vacancies,
-        applications: applications,
-        created_at: currentQuote?.created_at || new Date().toISOString(),
-        updated_at: new Date().toISOString()
-      });
+      // Update the current quote with the new data
+      if (currentQuote) {
+        setCurrentQuote({
+          ...currentQuote,
+          name,
+          implementation_fee: implementationFee,
+          annual_discount: annualDiscount,
+          ae_csm_name: aeCsmName,
+          champion_name: championName,
+          economic_buyer_name: economicBuyerName,
+          ftes: ftes,
+          vacancies: vacancies,
+          applications: applications,
+          updated_at: new Date().toISOString()
+        });
+      } else if (quoteId) {
+        setCurrentQuote({
+          id: quoteId,
+          profile_id: profile.id,
+          name,
+          implementation_fee: implementationFee,
+          annual_discount: annualDiscount,
+          ae_csm_name: aeCsmName,
+          champion_name: championName,
+          economic_buyer_name: economicBuyerName,
+          ftes: ftes,
+          vacancies: vacancies,
+          applications: applications,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        });
+      }
       
       toast.success(`Quote "${name}" saved successfully`);
       setSaveModalOpen(false);
@@ -258,6 +282,7 @@ const Dashboard = () => {
       setImplementationFee(quoteData.implementation_fee);
       setAnnualDiscount(quoteData.annual_discount);
       
+      // Update metric values
       setAeCsmName(quoteData.ae_csm_name);
       setChampionName(quoteData.champion_name);
       setEconomicBuyerName(quoteData.economic_buyer_name);

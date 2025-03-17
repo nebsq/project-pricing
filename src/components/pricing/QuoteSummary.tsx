@@ -112,41 +112,49 @@ const QuoteSummary = ({
                 LINE ITEMS
               </h3>
               <div className="flex text-xs text-muted-foreground">
-                <span className="mr-4">Monthly</span>
-                <span>Annual</span>
+                <span className="w-20 text-right">Monthly</span>
+                <span className="w-20 text-right">Annual</span>
               </div>
             </div>
             <Separator className="mb-4" />
 
             {Object.keys(groupedItems).length > 0 ? (
               <>
-                {Object.entries(groupedItems).map(([moduleName, items], index) => (
-                  <div key={moduleName} className="mb-4">
-                    <h4 className="uppercase text-sm font-semibold text-muted-foreground mb-2 bg-gray-50 p-2 rounded">
-                      {moduleName}
-                    </h4>
-                    
-                    {items.map((item) => (
-                      <div key={item.id} className="flex justify-between py-1">
-                        <span className="text-sm flex-grow">
-                          {item.feature} × {quantities[item.id]} {quantities[item.id] === 1 ? item.unit : `${item.unit}s`}
+                {Object.entries(groupedItems).map(([moduleName, items], moduleIndex) => {
+                  // Calculate total quantity for module
+                  const totalModuleQuantity = items.reduce(
+                    (total, item) => total + quantities[item.id], 
+                    0
+                  );
+                  
+                  // Calculate total monthly cost for module
+                  const totalModuleMonthly = items.reduce(
+                    (total, item) => total + item.monthly_price * quantities[item.id],
+                    0
+                  );
+                  
+                  return (
+                    <div key={moduleName} className="mb-4">
+                      <div className="flex justify-between py-1 bg-gray-50 p-2 rounded">
+                        <span className="text-sm font-semibold">
+                          {moduleName} × {totalModuleQuantity}
                         </span>
-                        <div className="flex text-right space-x-4">
-                          <span className="text-xs font-medium text-gray-500 w-20">
-                            {formatCurrency(item.monthly_price * quantities[item.id])}
+                        <div className="flex space-x-4">
+                          <span className="text-xs font-medium text-gray-700 w-20 text-right">
+                            {formatCurrency(totalModuleMonthly)}
                           </span>
-                          <span className="text-xs font-medium text-gray-700 w-20">
-                            {formatCurrency(item.monthly_price * quantities[item.id] * 12)}
+                          <span className="text-xs font-medium text-gray-700 w-20 text-right">
+                            {formatCurrency(totalModuleMonthly * 12)}
                           </span>
                         </div>
                       </div>
-                    ))}
-                    
-                    {index < Object.entries(groupedItems).length - 1 && (
-                      <Separator className="my-3" />
-                    )}
-                  </div>
-                ))}
+                      
+                      {moduleIndex < Object.entries(groupedItems).length - 1 && (
+                        <Separator className="my-3" />
+                      )}
+                    </div>
+                  );
+                })}
               </>
             ) : (
               <div className="text-center py-8 text-muted-foreground">
@@ -159,7 +167,8 @@ const QuoteSummary = ({
       <CardFooter className="bg-white rounded-b-lg pt-0">
         <Button 
           onClick={onSaveClick}
-          className="w-full bg-[#FF6D00] hover:bg-[#FF6D00]/90 text-white"
+          variant="default"
+          className="w-full"
           disabled={selectedItems.length === 0}
         >
           <Save className="mr-2 h-4 w-4" />

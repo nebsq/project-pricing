@@ -65,9 +65,10 @@ const Metrics = ({
         <div className="space-y-6">
           <div>
             <h3 className="text-lg font-semibold font-display tracking-tight mb-4 text-[#FF6D00]">
-              Contact Information
+              Metrics
             </h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
               <div className="space-y-2">
                 <Label htmlFor="ae-csm-name">AE / CSM Name</Label>
                 <Input
@@ -99,12 +100,7 @@ const Metrics = ({
                 />
               </div>
             </div>
-          </div>
 
-          <div>
-            <h3 className="text-lg font-semibold font-display tracking-tight mb-4 text-[#FF6D00]">
-              Operating Metrics
-            </h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="ftes"># FTEs</Label>

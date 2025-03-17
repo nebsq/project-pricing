@@ -66,14 +66,13 @@ export default function SaveQuoteModal({
             variant="outline" 
             onClick={() => onOpenChange(false)}
             disabled={isSaving}
-            className="border-[#FF6D00]/20 text-gray-700 hover:border-[#FF6D00]/40 hover:bg-[#FF6D00]/5"
           >
             Cancel
           </Button>
           <Button 
             onClick={handleSave} 
             disabled={isSaving || !quoteName.trim()}
-            className="bg-[#FF6D00] hover:bg-[#FF6D00]/90 text-white"
+            variant="default"
           >
             {isSaving ? 'Saving...' : 'Save Quote'}
           </Button>
