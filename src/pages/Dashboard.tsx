@@ -297,7 +297,7 @@ const Dashboard = () => {
                     <li>Enable copying or exporting the "Quote Summary" for use in other docs.</li>
                     <li className="ml-4">Discovery needed - what do we want here? What format is useful? .pdf? Slick copy+paste?</li>
                     <li>🚧 Semi-implemented it anyway. Unclear if pricing versions are required. Needs scoping.</li>
-                    <li>More to come?</li>
+                    <li>✅ Created the ability to name and save quotes. If there was a discrepancy between an already saved quote and the currently available pricing modules it should warn you.</li>
                   </ul>
                 </div>
 
