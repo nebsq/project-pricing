@@ -12,7 +12,6 @@ import ImplementationSection from "@/components/pricing/ImplementationSection";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/navigation/AppSidebar";
 import SaveQuoteModal from "@/components/pricing/SaveQuoteModal";
-
 const Dashboard = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
@@ -25,47 +24,43 @@ const Dashboard = () => {
   const [isSaving, setIsSaving] = useState(false);
   const [currentQuote, setCurrentQuote] = useState<Quote | null>(null);
   const [pricingRefreshCooldown, setPricingRefreshCooldown] = useState(false);
-
   useEffect(() => {
     checkUser();
     fetchPricingModules();
   }, []);
-
   const checkUser = async () => {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: {
+          user
+        }
+      } = await supabase.auth.getUser();
       if (!user) {
         navigate('/auth');
       } else {
-        const { data: profileData, error } = await supabase
-          .from('profiles')
-          .select('*')
-          .eq('id', user.id)
-          .maybeSingle();
-        
+        const {
+          data: profileData,
+          error
+        } = await supabase.from('profiles').select('*').eq('id', user.id).maybeSingle();
         if (error && error.code !== 'PGRST116') {
           console.error('Error fetching profile:', error.message);
           throw error;
         }
-
         if (!profileData) {
           const newProfile: Profile = {
             id: user.id,
             full_name: user.user_metadata.full_name || user.email?.split('@')[0] || 'User',
             is_admin: false,
             created_at: user.created_at,
-            updated_at: user.updated_at || user.created_at,
+            updated_at: user.updated_at || user.created_at
           };
-
-          const { error: insertError } = await supabase
-            .from('profiles')
-            .insert(newProfile);
-
+          const {
+            error: insertError
+          } = await supabase.from('profiles').insert(newProfile);
           if (insertError) {
             console.error('Error creating profile:', insertError.message);
             throw insertError;
           }
-
           setProfile(newProfile);
           toast.success("Profile created successfully");
         } else {
@@ -81,15 +76,12 @@ const Dashboard = () => {
       setLoading(false);
     }
   };
-
   const fetchPricingModules = async () => {
     try {
-      const { data, error } = await supabase
-        .from('pricing_modules')
-        .select('*')
-        .order('module')
-        .order('feature');
-
+      const {
+        data,
+        error
+      } = await supabase.from('pricing_modules').select('*').order('module').order('feature');
       if (error) throw error;
       setPricingModules(data as PricingModule[] || []);
     } catch (error: Error | unknown) {
@@ -97,47 +89,39 @@ const Dashboard = () => {
       toast.error("Failed to load pricing modules");
     }
   };
-
   const handleSignOut = async () => {
     await supabase.auth.signOut();
     navigate('/auth');
   };
-
   const handleQuantityChange = (id: string, quantity: number) => {
     setQuantities(prev => ({
       ...prev,
       [id]: quantity
     }));
   };
-
   const handleImplementationFeeChange = (value: number | null) => {
     setImplementationFee(value);
   };
-
   const handleAnnualDiscountChange = (value: number | null) => {
     setAnnualDiscount(value);
   };
-
   const handleSaveClick = () => {
     setSaveModalOpen(true);
   };
-
   const handleRefreshPricing = async () => {
     if (pricingRefreshCooldown) {
       toast.info("Please wait before refreshing pricing again");
       return;
     }
-
     setPricingRefreshCooldown(true);
     setTimeout(() => setPricingRefreshCooldown(false), 60000);
-
     try {
-      const { error } = await supabase.functions.invoke('update-pricing');
-      
+      const {
+        error
+      } = await supabase.functions.invoke('update-pricing');
       if (error) {
         throw error;
       }
-      
       toast.success("Pricing refresh triggered successfully");
       setTimeout(() => fetchPricingModules(), 2000);
     } catch (error) {
@@ -145,25 +129,18 @@ const Dashboard = () => {
       toast.error("Failed to refresh pricing");
     }
   };
-
   const handleSaveQuote = async (name: string) => {
     if (!profile) {
       toast.error("You must be logged in to save quotes");
       return;
     }
-
     setIsSaving(true);
-    
     try {
-      const selectedItems = pricingModules.filter(
-        module => quantities[module.id] && quantities[module.id] > 0
-      );
-      
+      const selectedItems = pricingModules.filter(module => quantities[module.id] && quantities[module.id] > 0);
       if (selectedItems.length === 0) {
         toast.error("Cannot save an empty quote");
         return;
       }
-
       const quoteData = {
         id: currentQuote?.id,
         profile_id: profile.id,
@@ -172,35 +149,26 @@ const Dashboard = () => {
         annual_discount: annualDiscount,
         updated_at: new Date().toISOString()
       };
-
-      const { data, error: quoteError } = await supabase
-        .from('quotes')
-        .upsert(quoteData, { 
-          onConflict: 'id'
-        })
-        .select();
-
+      const {
+        data,
+        error: quoteError
+      } = await supabase.from('quotes').upsert(quoteData, {
+        onConflict: 'id'
+      }).select();
       if (quoteError) throw quoteError;
-      
       let quoteId = currentQuote?.id;
-      
       if (!quoteId && data && data.length > 0) {
         quoteId = data[0].id;
       }
-
       if (!quoteId) {
         throw new Error("Failed to create quote");
       }
-
       if (currentQuote?.id) {
-        const { error: deleteError } = await supabase
-          .from('quote_items')
-          .delete()
-          .eq('quote_id', currentQuote.id);
-          
+        const {
+          error: deleteError
+        } = await supabase.from('quote_items').delete().eq('quote_id', currentQuote.id);
         if (deleteError) throw deleteError;
       }
-
       const quoteItems = selectedItems.map(item => ({
         quote_id: quoteId,
         pricing_module_id: item.id,
@@ -210,13 +178,10 @@ const Dashboard = () => {
         monthly_price: item.monthly_price,
         quantity: quantities[item.id]
       }));
-
-      const { error: itemsError } = await supabase
-        .from('quote_items')
-        .insert(quoteItems);
-
+      const {
+        error: itemsError
+      } = await supabase.from('quote_items').insert(quoteItems);
       if (itemsError) throw itemsError;
-
       setCurrentQuote({
         id: quoteId,
         profile_id: profile.id,
@@ -226,7 +191,6 @@ const Dashboard = () => {
         created_at: currentQuote?.created_at || new Date().toISOString(),
         updated_at: new Date().toISOString()
       });
-
       toast.success(`Quote "${name}" saved successfully`);
       setSaveModalOpen(false);
     } catch (error: any) {
@@ -236,38 +200,28 @@ const Dashboard = () => {
       setIsSaving(false);
     }
   };
-
   const loadQuote = async (quoteId: string) => {
     setLoading(true);
     try {
-      const { data: quoteData, error: quoteError } = await supabase
-        .from('quotes')
-        .select('*')
-        .eq('id', quoteId)
-        .single();
-
+      const {
+        data: quoteData,
+        error: quoteError
+      } = await supabase.from('quotes').select('*').eq('id', quoteId).single();
       if (quoteError) throw quoteError;
-
-      const { data: itemsData, error: itemsError } = await supabase
-        .from('quote_items')
-        .select('*')
-        .eq('quote_id', quoteId);
-
+      const {
+        data: itemsData,
+        error: itemsError
+      } = await supabase.from('quote_items').select('*').eq('quote_id', quoteId);
       if (itemsError) throw itemsError;
-
       setCurrentQuote(quoteData as Quote);
-      
       setImplementationFee(quoteData.implementation_fee);
       setAnnualDiscount(quoteData.annual_discount);
-
       const newQuantities: Record<string, number> = {};
-      
       itemsData.forEach((item: QuoteItem) => {
         if (item.pricing_module_id) {
           newQuantities[item.pricing_module_id] = item.quantity;
         }
       });
-
       setQuantities(newQuantities);
       toast.success(`Quote "${quoteData.name}" loaded`);
     } catch (error) {
@@ -277,7 +231,6 @@ const Dashboard = () => {
       setLoading(false);
     }
   };
-
   const handleNewQuote = () => {
     setCurrentQuote(null);
     setQuantities({});
@@ -285,20 +238,11 @@ const Dashboard = () => {
     setAnnualDiscount(null);
     toast.success("Started new quote");
   };
-
   const groupedModules = groupBy(pricingModules, 'module');
-
   if (loading) {
-    return (
-      <SidebarProvider>
+    return <SidebarProvider>
         <div className="min-h-screen bg-[#F9F8F4] flex">
-          <AppSidebar 
-            onSignOut={handleSignOut}
-            onQuoteSelect={loadQuote}
-            onCreateNew={handleNewQuote}
-            onRefreshPricing={handleRefreshPricing}
-            profileId={profile?.id || null}
-          />
+          <AppSidebar onSignOut={handleSignOut} onQuoteSelect={loadQuote} onCreateNew={handleNewQuote} onRefreshPricing={handleRefreshPricing} profileId={profile?.id || null} />
           <div className="flex-1 p-6 pt-8">
             <Card>
               <CardHeader>
@@ -314,20 +258,11 @@ const Dashboard = () => {
             </Card>
           </div>
         </div>
-      </SidebarProvider>
-    )
+      </SidebarProvider>;
   }
-
-  return (
-    <SidebarProvider>
+  return <SidebarProvider>
       <div className="min-h-screen bg-[#F9F8F4] flex">
-        <AppSidebar 
-          onSignOut={handleSignOut}
-          onQuoteSelect={loadQuote}
-          onCreateNew={handleNewQuote}
-          onRefreshPricing={handleRefreshPricing}
-          profileId={profile?.id || null}
-        />
+        <AppSidebar onSignOut={handleSignOut} onQuoteSelect={loadQuote} onCreateNew={handleNewQuote} onRefreshPricing={handleRefreshPricing} profileId={profile?.id || null} />
         
         <div className="flex-1 p-6 pt-8">
           <div className="space-y-6 max-w-7xl mx-auto">
@@ -358,10 +293,10 @@ const Dashboard = () => {
                   </p>
                   
                   <ul className="list-disc list-inside mt-2 text-muted-foreground">
-                    <li>Do we want the LINE ITEMS in the quote summary with monthyl or annual prices?</li>
+                    <li>Do we want the LINE ITEMS in the quote summary with monthly or annual prices?</li>
                     <li>Enable copying or exporting the "Quote Summary" for use in other docs.</li>
                     <li className="ml-4">Discovery needed - what do we want here? What format is useful? .pdf? Slick copy+paste?</li>
-                    <li>Unclear if pricing versions are required. Needs scoping.</li>
+                    <li>🚧 Semi-implemented it anyway. Unclear if pricing versions are required. Needs scoping.</li>
                     <li>More to come?</li>
                   </ul>
                 </div>
@@ -377,50 +312,23 @@ const Dashboard = () => {
                 </div>
 
                 <div className="space-y-6">
-                  {Object.entries(groupedModules).map(([moduleName, features]) => (
-                    <ModuleGroup
-                      key={moduleName}
-                      moduleName={moduleName}
-                      features={features}
-                      quantities={quantities}
-                      onChange={handleQuantityChange}
-                    />
-                  ))}
+                  {Object.entries(groupedModules).map(([moduleName, features]) => <ModuleGroup key={moduleName} moduleName={moduleName} features={features} quantities={quantities} onChange={handleQuantityChange} />)}
                   
-                  <ImplementationSection 
-                    implementationFee={implementationFee}
-                    annualDiscount={annualDiscount}
-                    onImplementationFeeChange={handleImplementationFeeChange}
-                    onAnnualDiscountChange={handleAnnualDiscountChange}
-                  />
+                  <ImplementationSection implementationFee={implementationFee} annualDiscount={annualDiscount} onImplementationFeeChange={handleImplementationFeeChange} onAnnualDiscountChange={handleAnnualDiscountChange} />
                 </div>
               </div>
 
               <div className="md:col-span-4">
                 <div className="sticky top-8">
-                  <QuoteSummary
-                    selectedModules={pricingModules}
-                    quantities={quantities}
-                    implementationFee={implementationFee}
-                    annualDiscount={annualDiscount}
-                    onSaveClick={handleSaveClick}
-                    quoteName={currentQuote?.name}
-                  />
+                  <QuoteSummary selectedModules={pricingModules} quantities={quantities} implementationFee={implementationFee} annualDiscount={annualDiscount} onSaveClick={handleSaveClick} quoteName={currentQuote?.name} />
                 </div>
               </div>
             </div>
           </div>
         </div>
         
-        <SaveQuoteModal 
-          open={saveModalOpen}
-          onOpenChange={setSaveModalOpen}
-          onSave={handleSaveQuote}
-          isSaving={isSaving}
-        />
+        <SaveQuoteModal open={saveModalOpen} onOpenChange={setSaveModalOpen} onSave={handleSaveQuote} isSaving={isSaving} />
       </div>
-    </SidebarProvider>
-  )
+    </SidebarProvider>;
 };
-
 export default Dashboard;
