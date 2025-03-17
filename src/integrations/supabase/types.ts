@@ -119,31 +119,49 @@ export type Database = {
       }
       quotes: {
         Row: {
+          ae_csm_name: string | null
           annual_discount: number | null
+          applications: number | null
+          champion_name: string | null
           created_at: string
+          economic_buyer_name: string | null
+          ftes: number | null
           id: string
           implementation_fee: number | null
           name: string
           profile_id: string
           updated_at: string
+          vacancies: number | null
         }
         Insert: {
+          ae_csm_name?: string | null
           annual_discount?: number | null
+          applications?: number | null
+          champion_name?: string | null
           created_at?: string
+          economic_buyer_name?: string | null
+          ftes?: number | null
           id?: string
           implementation_fee?: number | null
           name: string
           profile_id: string
           updated_at?: string
+          vacancies?: number | null
         }
         Update: {
+          ae_csm_name?: string | null
           annual_discount?: number | null
+          applications?: number | null
+          champion_name?: string | null
           created_at?: string
+          economic_buyer_name?: string | null
+          ftes?: number | null
           id?: string
           implementation_fee?: number | null
           name?: string
           profile_id?: string
           updated_at?: string
+          vacancies?: number | null
         }
         Relationships: [
           {
