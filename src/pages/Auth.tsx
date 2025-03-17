@@ -1,12 +1,15 @@
+
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { toast } from "sonner";
+import { toast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { Separator } from "@/components/ui/separator";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Info } from "lucide-react";
 
 const Auth = () => {
   const [isSignUp, setIsSignUp] = useState(false);
@@ -14,6 +17,7 @@ const Auth = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [fullName, setFullName] = useState('');
+  const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
 
   // Check if user is already authenticated on component mount
@@ -30,6 +34,7 @@ const Auth = () => {
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    setError(null);
 
     try {
       if (isSignUp) {
@@ -42,7 +47,8 @@ const Auth = () => {
         });
 
         if (error) throw error;
-        toast.success("Success!", {
+        toast({
+          title: "Account created",
           description: "Check your email for the confirmation link.",
         });
       } else {
@@ -55,8 +61,12 @@ const Auth = () => {
         navigate('/dashboard');
       }
     } catch (error: unknown) {
-      toast.error("Error", {
-        description: error instanceof Error ? error.message : 'An error occurred'
+      const errorMessage = error instanceof Error ? error.message : 'An error occurred';
+      setError(errorMessage);
+      toast({
+        variant: "destructive",
+        title: "Authentication failed",
+        description: errorMessage,
       });
     } finally {
       setLoading(false);
@@ -66,6 +76,7 @@ const Auth = () => {
   const handleGoogleSignIn = async () => {
     try {
       setLoading(true);
+      setError(null);
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
@@ -75,17 +86,25 @@ const Auth = () => {
 
       if (error) throw error;
     } catch (error: unknown) {
-      toast.error(error instanceof Error ? error.message : 'An error occurred');
+      const errorMessage = error instanceof Error ? error.message : 'An error occurred';
+      setError(errorMessage);
+      toast({
+        variant: "destructive",
+        title: "Authentication failed",
+        description: errorMessage,
+      });
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-background">
-      <Card className="w-full max-w-md">
-        <CardHeader>
-          <CardTitle>{isSignUp ? 'Create Account' : 'Sign In'}</CardTitle>
+    <div className="flex justify-center items-center min-h-screen bg-[#F9F8F4]">
+      <Card className="w-full max-w-md shadow-lg">
+        <CardHeader className="space-y-1">
+          <CardTitle className="text-2xl font-display text-[#FF6D00]">
+            {isSignUp ? 'Create Account' : 'Sign In'}
+          </CardTitle>
           <CardDescription>
             {isSignUp
               ? 'Create a new account to access all features'
@@ -93,6 +112,14 @@ const Auth = () => {
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
+          {error && (
+            <Alert variant="destructive">
+              <Info className="h-4 w-4" />
+              <AlertTitle>Error</AlertTitle>
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
+          )}
+          
           <Button 
             onClick={handleGoogleSignIn}
             disabled={loading}
@@ -135,6 +162,7 @@ const Auth = () => {
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
                   required={isSignUp}
+                  className="border-[#FF6D00]/20 focus-visible:ring-[#FF6D00]"
                 />
               </div>
             )}
@@ -146,6 +174,7 @@ const Auth = () => {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
+                className="border-[#FF6D00]/20 focus-visible:ring-[#FF6D00]"
               />
             </div>
             <div className="space-y-2 mt-4">
@@ -156,10 +185,15 @@ const Auth = () => {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
+                className="border-[#FF6D00]/20 focus-visible:ring-[#FF6D00]"
               />
             </div>
             
-            <Button type="submit" className="w-full mt-4" disabled={loading}>
+            <Button 
+              type="submit" 
+              className="w-full mt-4 bg-[#FF6D00] hover:bg-[#FF6D00]/90" 
+              disabled={loading}
+            >
               {loading ? 'Processing...' : isSignUp ? 'Sign Up' : 'Sign In'}
             </Button>
           </form>
@@ -168,7 +202,7 @@ const Auth = () => {
           <Button
             type="button"
             variant="ghost"
-            className="w-full"
+            className="w-full text-[#FF6D00] hover:text-[#FF6D00]/90 hover:bg-[#FF6D00]/10"
             onClick={() => setIsSignUp(!isSignUp)}
           >
             {isSignUp ? 'Already have an account? Sign In' : "Don't have an account? Sign Up"}
