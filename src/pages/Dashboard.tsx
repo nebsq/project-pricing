@@ -350,11 +350,13 @@ const Dashboard = () => {
                   </p>
                   
                   <ul className="list-disc list-inside mt-2 text-muted-foreground">
-                    <li>✅ Do we want the LINE ITEMS in the quote summary with monthly or annual prices? Added both.</li>
+                    <li>✅ Do we want the LINE ITEMS in the quote summary with monthly or annual prices? <strong>Added both.</strong></li>
+                    <li>✅ Added 'Metrics' section. All these values are now stored together with each Quote.</li>
+                    <li>✅ Cleaned up the 'Quote Summary' a bit.</li>
+                    <li>✅ Created the ability to name and save quotes. If there was a discrepancy between an already saved quote and the currently available pricing modules it should warn you.</li>
+                    <li>🚧 Unclear if pricing versions are required. Needs scoping. <strong>Semi-implemented it anyway in the above point.</strong></li>
                     <li>Enable copying or exporting the "Quote Summary" for use in other docs.</li>
                     <li className="ml-4">Discovery needed - what do we want here? What format is useful? .pdf? Slick copy+paste?</li>
-                    <li>🚧 Unclear if pricing versions are required. Needs scoping. Semi-implemented it anyway.</li>
-                    <li>✅ Created the ability to name and save quotes. If there was a discrepancy between an already saved quote and the currently available pricing modules it should warn you.</li>
                   </ul>
                 </div>
 
