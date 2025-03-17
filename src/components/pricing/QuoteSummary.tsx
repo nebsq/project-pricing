@@ -90,13 +90,13 @@ const QuoteSummary = ({
               <span className="font-bold">{formatCurrency(monthlyCost * 12)}</span>
             </div>
             {annualDiscount !== null && annualDiscount > 0 && (
-              <div className="flex justify-between text-sm text-gray-600">
+              <div className="flex justify-between text-xs text-gray-600">
                 <span>Annual Discount ({annualDiscount}%)</span>
                 <span className="font-medium">- {formatCurrency(discountAmount)}</span>
               </div>
             )}
             {implementationFee !== null && implementationFee > 0 && (
-              <div className="flex justify-between text-sm text-gray-600">
+              <div className="flex justify-between text-xs text-gray-600">
                 <span>Implementation Fee ({implementationFee}%)</span>
                 <span className="font-medium">+ {formatCurrency(implFee)}</span>
               </div>
@@ -115,8 +115,8 @@ const QuoteSummary = ({
                 LINE ITEMS
               </h3>
               <div className="flex text-xs text-muted-foreground">
-                <span className="w-24 text-right mr-0.5">Monthly</span>
-                <span className="w-24 text-right">Annual</span>
+                <span className="w-20 text-right mr-0.5">Monthly</span>
+                <span className="w-16 text-right">Annual</span>
               </div>
             </div>
             <Separator className="mb-4" />
@@ -140,10 +140,10 @@ const QuoteSummary = ({
                               {item.feature} × {quantities[item.id]}
                             </span>
                             <div className="flex">
-                              <span className="text-xs font-medium text-gray-700 w-24 text-right mr-0.5">
+                              <span className="text-xs font-medium text-gray-700 w-20 text-right mr-0.5">
                                 {formatCurrency(monthlyPrice)}
                               </span>
-                              <span className="text-xs font-medium text-gray-700 w-24 text-right">
+                              <span className="text-xs font-medium text-gray-700 w-16 text-right">
                                 {formatCurrency(monthlyPrice * 12)}
                               </span>
                             </div>
