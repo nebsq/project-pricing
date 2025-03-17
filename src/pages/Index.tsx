@@ -1,4 +1,3 @@
-
 import { ChevronRight, ChevronUp, Mail } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -6,43 +5,39 @@ import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { supabase } from "@/integrations/supabase/client";
 import { Separator } from '@/components/ui/separator';
-
 const Index = () => {
   const [showScrollTop, setShowScrollTop] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
-  
+
   // Track scroll position for scroll-to-top button
   useEffect(() => {
     const handleScroll = () => {
       setShowScrollTop(window.scrollY > 500);
     };
-    
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
-  
   const scrollToTop = () => {
     window.scrollTo({
       top: 0,
       behavior: 'smooth'
     });
   };
-
   const navigateToAuth = () => {
     navigate('/auth');
   };
-  
   const signInWithGoogle = async () => {
     setIsLoading(true);
     try {
-      const { error } = await supabase.auth.signInWithOAuth({
+      const {
+        error
+      } = await supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
           redirectTo: `${window.location.origin}/dashboard`
         }
       });
-      
       if (error) throw error;
     } catch (error) {
       console.error('Error signing in with Google:', error);
@@ -50,9 +45,7 @@ const Index = () => {
       setIsLoading(false);
     }
   };
-  
-  return (
-    <div className="min-h-screen bg-background text-foreground">
+  return <div className="min-h-screen bg-background text-foreground">
       {/* Hero section only */}
       <section className="min-h-screen flex items-center justify-center relative overflow-hidden">
         {/* Background elements */}
@@ -69,9 +62,7 @@ const Index = () => {
             </div>
             
             {/* Headline */}
-            <h1 className="text-4xl sm:text-5xl md:text-6xl xl:text-7xl font-display font-semibold tracking-tight text-foreground mb-6 leading-tight text-balance">
-              inploi's pricing calculator
-            </h1>
+            <h1 className="text-4xl sm:text-5xl xl:text-7xl font-display font-semibold tracking-tight text-foreground mb-6 leading-tight text-balance mx-0 my-[17px] py-[29px] px-[23px] md:text-6xl">inploi's pricing hey freddie</h1>
             
             {/* Subheading */}
             <p className="text-lg sm:text-xl text-foreground/80 mb-10 max-w-3xl text-balance">
@@ -85,28 +76,12 @@ const Index = () => {
               </h2>
               
               <div className="space-y-4">
-                <Button 
-                  onClick={signInWithGoogle}
-                  disabled={isLoading}
-                  className="w-full bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 font-medium"
-                >
+                <Button onClick={signInWithGoogle} disabled={isLoading} className="w-full bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 font-medium">
                   <svg className="mr-2 h-5 w-5" viewBox="0 0 24 24">
-                    <path 
-                      d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" 
-                      fill="#4285F4" 
-                    />
-                    <path 
-                      d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" 
-                      fill="#34A853" 
-                    />
-                    <path 
-                      d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" 
-                      fill="#FBBC05" 
-                    />
-                    <path 
-                      d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" 
-                      fill="#EA4335" 
-                    />
+                    <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" />
+                    <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853" />
+                    <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05" />
+                    <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335" />
                   </svg>
                   Sign in with Google
                 </Button>
@@ -117,11 +92,7 @@ const Index = () => {
                   <Separator className="flex-1" />
                 </div>
                 
-                <Button 
-                  onClick={navigateToAuth}
-                  variant="outline"
-                  className="w-full border-[#F97316] text-[#F97316] hover:bg-[#F97316]/5"
-                >
+                <Button onClick={navigateToAuth} variant="outline" className="w-full border-[#F97316] text-[#F97316] hover:bg-[#F97316]/5">
                   <Mail className="mr-2 h-5 w-5" />
                   Continue with Email
                 </Button>
@@ -165,18 +136,9 @@ const Index = () => {
       </footer>
       
       {/* Scroll to top button */}
-      <button
-        onClick={scrollToTop}
-        className={cn(
-          "fixed bottom-6 right-6 h-12 w-12 rounded-full bg-[#F97316]/90 text-white flex items-center justify-center shadow-md hover:bg-[#F97316] transition-all duration-300 ease-out z-40",
-          showScrollTop ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10 pointer-events-none"
-        )}
-        aria-label="Scroll to top"
-      >
+      <button onClick={scrollToTop} className={cn("fixed bottom-6 right-6 h-12 w-12 rounded-full bg-[#F97316]/90 text-white flex items-center justify-center shadow-md hover:bg-[#F97316] transition-all duration-300 ease-out z-40", showScrollTop ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10 pointer-events-none")} aria-label="Scroll to top">
         <ChevronUp size={20} />
       </button>
-    </div>
-  );
+    </div>;
 };
-
 export default Index;
