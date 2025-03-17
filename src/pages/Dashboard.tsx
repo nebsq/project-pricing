@@ -178,17 +178,14 @@ const Dashboard = () => {
         .upsert(quoteData, { 
           onConflict: 'id'
         })
-        .select('quotes'); // Use table name instead of '*'
+        .select();
 
       if (quoteError) throw quoteError;
       
       let quoteId = currentQuote?.id;
       
-      if (!quoteId && data) {
-        const insertedData = data as unknown as Quote[]; // Add type assertion
-        if (insertedData.length > 0) {
-          quoteId = insertedData[0].id;
-        }
+      if (!quoteId && data && data.length > 0) {
+        quoteId = data[0].id;
       }
 
       if (!quoteId) {

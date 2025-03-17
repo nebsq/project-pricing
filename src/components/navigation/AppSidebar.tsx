@@ -27,7 +27,6 @@ interface AppSidebarProps {
   onCreateNew: () => void;
   onRefreshPricing: () => void;
   profileId: string | null;
-  selectedQuoteId?: string; // Add this to track selected quote
 }
 
 export function AppSidebar({ 
@@ -57,6 +56,7 @@ export function AppSidebar({
       const { data, error } = await supabase
         .from('quotes')
         .select('*')
+        .eq('profile_id', profileId)
         .order('updated_at', { ascending: false });
 
       if (error) throw error;
@@ -78,17 +78,16 @@ export function AppSidebar({
   const buttonStyles = cn(
     "w-full justify-start",
     "bg-background/40",
-    "transition-all duration-75", // Faster transition for snappier feel
-    "relative group", // Add group for hover effects
+    "transition-all duration-75",
+    "relative group",
     "border-l-2 border-transparent",
-    "data-[active=true]:bg-orange-50/30 dark:data-[active=true]:bg-orange-950/10", // Subtle active state
-    "data-[active=true]:border-orange-500/50", // Soft border for active state
-    "hover:bg-orange-50/20 dark:hover:bg-orange-950/10", // Soft tangerine background
-    "hover:border-orange-500/30", // Softer border on hover
+    "data-[active=true]:bg-orange-50/30 dark:data-[active=true]:bg-orange-950/10",
+    "data-[active=true]:border-orange-500/50",
+    "hover:bg-orange-50/20 dark:hover:bg-orange-950/10",
+    "hover:border-orange-500/30",
     "rounded-r-md",
-    // Remove the underline effect for cleaner look
-    "[&>svg]:transition-colors [&>svg]:duration-75", // Smooth icon color transition
-    "group-hover:[&>svg]:text-orange-600/70" // Icon color on hover
+    "[&>svg]:transition-colors [&>svg]:duration-75",
+    "group-hover:[&>svg]:text-orange-600/70"
   );
 
   const startHolding = () => {
@@ -101,8 +100,8 @@ export function AppSidebar({
       await onRefreshPricing();
       resetButton();
       setIsDisabled(true);
-      setTimeout(() => setIsDisabled(false), 60000); // 1-minute cooldown
-    }, 3000); // 3 second hold time
+      setTimeout(() => setIsDisabled(false), 60000);
+    }, 3000);
 
     progressIntervalRef.current = setInterval(() => {
       setProgress(prev => Math.min(prev + (100 / 30), 100));
@@ -131,13 +130,13 @@ export function AppSidebar({
             <img 
               src={inploiLogomark} 
               alt="inploi" 
-              className="h-7 w-auto" // Changed from fixed width to auto to maintain aspect ratio
+              className="h-7 w-auto" 
             />
           ) : (
             <img 
               src={inploiFullLogo} 
               alt="inploi" 
-              className="h-8 w-auto" // Added w-auto for consistency
+              className="h-8 w-auto" 
             />
           )}
         </div>
@@ -147,11 +146,12 @@ export function AppSidebar({
             tooltip="New Quote"
             className={buttonStyles}
           >
-            <FilePlus className="h-4 w-4 text-muted-foreground" /> {/* Base icon color */}
+            <FilePlus className="h-4 w-4 text-muted-foreground" />
             {!isCollapsed && <span>New Quote</span>}
           </SidebarMenuButton>
+          
           <SidebarMenuButton
-            onClick={() => {}} // Empty onClick as we're using mouse events
+            onClick={() => {}}
             onMouseDown={startHolding}
             onMouseUp={resetButton}
             onMouseLeave={resetButton}
@@ -206,7 +206,7 @@ export function AppSidebar({
                       }}
                       tooltip={quote.name}
                       className={buttonStyles}
-                      isActive={selectedQuoteId === quote.id} // Add selected state
+                      isActive={selectedQuoteId === quote.id}
                     >
                       <FileText className="h-4 w-4 text-muted-foreground group-hover:text-primary" />
                       {!isCollapsed && (
