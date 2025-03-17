@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -14,7 +13,6 @@ import Metrics from "@/components/pricing/Metrics";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/navigation/AppSidebar";
 import SaveQuoteModal from "@/components/pricing/SaveQuoteModal";
-
 const Dashboard = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
@@ -27,19 +25,16 @@ const Dashboard = () => {
   const [isSaving, setIsSaving] = useState(false);
   const [currentQuote, setCurrentQuote] = useState<Quote | null>(null);
   const [pricingRefreshCooldown, setPricingRefreshCooldown] = useState(false);
-
   const [aeCsmName, setAeCsmName] = useState<string | null>(null);
   const [championName, setChampionName] = useState<string | null>(null);
   const [economicBuyerName, setEconomicBuyerName] = useState<string | null>(null);
   const [ftes, setFtes] = useState<number | null>(null);
   const [vacancies, setVacancies] = useState<number | null>(null);
   const [applications, setApplications] = useState<number | null>(null);
-
   useEffect(() => {
     checkUser();
     fetchPricingModules();
   }, []);
-
   const checkUser = async () => {
     try {
       const {
@@ -88,7 +83,6 @@ const Dashboard = () => {
       setLoading(false);
     }
   };
-
   const fetchPricingModules = async () => {
     try {
       const {
@@ -102,31 +96,25 @@ const Dashboard = () => {
       toast.error("Failed to load pricing modules");
     }
   };
-
   const handleSignOut = async () => {
     await supabase.auth.signOut();
     navigate('/auth');
   };
-
   const handleQuantityChange = (id: string, quantity: number) => {
     setQuantities(prev => ({
       ...prev,
       [id]: quantity
     }));
   };
-
   const handleImplementationFeeChange = (value: number | null) => {
     setImplementationFee(value);
   };
-
   const handleAnnualDiscountChange = (value: number | null) => {
     setAnnualDiscount(value);
   };
-
   const handleSaveClick = () => {
     setSaveModalOpen(true);
   };
-
   const handleRefreshPricing = async () => {
     if (pricingRefreshCooldown) {
       toast.info("Please wait before refreshing pricing again");
@@ -148,7 +136,6 @@ const Dashboard = () => {
       toast.error("Failed to refresh pricing");
     }
   };
-
   const handleSaveQuote = async (name: string) => {
     if (!profile) {
       toast.error("You must be logged in to save quotes");
@@ -161,7 +148,7 @@ const Dashboard = () => {
         toast.error("Cannot save an empty quote");
         return;
       }
-      
+
       // Create the quote data object with the correct type
       const quoteData = {
         id: currentQuote?.id,
@@ -177,25 +164,21 @@ const Dashboard = () => {
         applications: applications,
         updated_at: new Date().toISOString()
       };
-      
       const {
         data,
         error: quoteError
       } = await supabase.from('quotes').upsert(quoteData, {
         onConflict: 'id'
       }).select();
-      
       if (quoteError) throw quoteError;
-      
       let quoteId = currentQuote?.id;
       if (!quoteId && data && data.length > 0) {
         quoteId = data[0].id;
       }
-      
       if (!quoteId) {
         throw new Error("Failed to create quote");
       }
-      
+
       // If we're updating an existing quote, delete all its items first
       if (currentQuote?.id) {
         const {
@@ -203,7 +186,7 @@ const Dashboard = () => {
         } = await supabase.from('quote_items').delete().eq('quote_id', currentQuote.id);
         if (deleteError) throw deleteError;
       }
-      
+
       // Create quote items
       const quoteItems = selectedItems.map(item => ({
         quote_id: quoteId,
@@ -214,12 +197,11 @@ const Dashboard = () => {
         monthly_price: item.monthly_price,
         quantity: quantities[item.id]
       }));
-      
       const {
         error: itemsError
       } = await supabase.from('quote_items').insert(quoteItems);
       if (itemsError) throw itemsError;
-      
+
       // Update the current quote with the new data
       if (currentQuote) {
         setCurrentQuote({
@@ -252,7 +234,6 @@ const Dashboard = () => {
           updated_at: new Date().toISOString()
         });
       }
-      
       toast.success(`Quote "${name}" saved successfully`);
       setSaveModalOpen(false);
     } catch (error: any) {
@@ -262,7 +243,6 @@ const Dashboard = () => {
       setIsSaving(false);
     }
   };
-
   const loadQuote = async (quoteId: string) => {
     setLoading(true);
     try {
@@ -271,17 +251,15 @@ const Dashboard = () => {
         error: quoteError
       } = await supabase.from('quotes').select('*').eq('id', quoteId).single();
       if (quoteError) throw quoteError;
-      
       const {
         data: itemsData,
         error: itemsError
       } = await supabase.from('quote_items').select('*').eq('quote_id', quoteId);
       if (itemsError) throw itemsError;
-      
       setCurrentQuote(quoteData as Quote);
       setImplementationFee(quoteData.implementation_fee);
       setAnnualDiscount(quoteData.annual_discount);
-      
+
       // Update metric values
       setAeCsmName(quoteData.ae_csm_name);
       setChampionName(quoteData.champion_name);
@@ -289,7 +267,6 @@ const Dashboard = () => {
       setFtes(quoteData.ftes);
       setVacancies(quoteData.vacancies);
       setApplications(quoteData.applications);
-      
       const newQuantities: Record<string, number> = {};
       itemsData.forEach((item: QuoteItem) => {
         if (item.pricing_module_id) {
@@ -305,7 +282,6 @@ const Dashboard = () => {
       setLoading(false);
     }
   };
-
   const handleNewQuote = () => {
     setCurrentQuote(null);
     setQuantities({});
@@ -319,9 +295,7 @@ const Dashboard = () => {
     setApplications(null);
     toast.success("Started new quote");
   };
-
   const groupedModules = groupBy(pricingModules, 'module');
-
   if (loading) {
     return <SidebarProvider>
         <div className="min-h-screen bg-[#F9F8F4] flex">
@@ -343,16 +317,9 @@ const Dashboard = () => {
         </div>
       </SidebarProvider>;
   }
-
   return <SidebarProvider>
       <div className="min-h-screen bg-[#F9F8F4] flex">
-        <AppSidebar 
-          onSignOut={handleSignOut} 
-          onQuoteSelect={loadQuote} 
-          onCreateNew={handleNewQuote} 
-          onRefreshPricing={handleRefreshPricing} 
-          profileId={profile?.id || null} 
-        />
+        <AppSidebar onSignOut={handleSignOut} onQuoteSelect={loadQuote} onCreateNew={handleNewQuote} onRefreshPricing={handleRefreshPricing} profileId={profile?.id || null} />
         
         <div className="flex-1 p-6 pt-8">
           <div className="space-y-6 max-w-7xl mx-auto">
@@ -383,10 +350,10 @@ const Dashboard = () => {
                   </p>
                   
                   <ul className="list-disc list-inside mt-2 text-muted-foreground">
-                    <li>Do we want the LINE ITEMS in the quote summary with monthly or annual prices?</li>
+                    <li>✅ Do we want the LINE ITEMS in the quote summary with monthly or annual prices? Added both.</li>
                     <li>Enable copying or exporting the "Quote Summary" for use in other docs.</li>
                     <li className="ml-4">Discovery needed - what do we want here? What format is useful? .pdf? Slick copy+paste?</li>
-                    <li>🚧 Semi-implemented it anyway. Unclear if pricing versions are required. Needs scoping.</li>
+                    <li>🚧 Unclear if pricing versions are required. Needs scoping. Semi-implemented it anyway.</li>
                     <li>✅ Created the ability to name and save quotes. If there was a discrepancy between an already saved quote and the currently available pricing modules it should warn you.</li>
                   </ul>
                 </div>
@@ -398,66 +365,26 @@ const Dashboard = () => {
                   </h2>
                 </div>
 
-                <Metrics
-                  aeCsmName={aeCsmName}
-                  championName={championName}
-                  economicBuyerName={economicBuyerName}
-                  ftes={ftes}
-                  vacancies={vacancies}
-                  applications={applications}
-                  onAeCsmNameChange={setAeCsmName}
-                  onChampionNameChange={setChampionName}
-                  onEconomicBuyerNameChange={setEconomicBuyerName}
-                  onFtesChange={setFtes}
-                  onVacanciesChange={setVacancies}
-                  onApplicationsChange={setApplications}
-                  userName={profile?.full_name || ''}
-                />
+                <Metrics aeCsmName={aeCsmName} championName={championName} economicBuyerName={economicBuyerName} ftes={ftes} vacancies={vacancies} applications={applications} onAeCsmNameChange={setAeCsmName} onChampionNameChange={setChampionName} onEconomicBuyerNameChange={setEconomicBuyerName} onFtesChange={setFtes} onVacanciesChange={setVacancies} onApplicationsChange={setApplications} userName={profile?.full_name || ''} />
 
                 <div className="space-y-6">
-                  {Object.entries(groupedModules).map(([moduleName, features]) => (
-                    <ModuleGroup 
-                      key={moduleName} 
-                      moduleName={moduleName} 
-                      features={features} 
-                      quantities={quantities} 
-                      onChange={handleQuantityChange} 
-                    />
-                  ))}
+                  {Object.entries(groupedModules).map(([moduleName, features]) => <ModuleGroup key={moduleName} moduleName={moduleName} features={features} quantities={quantities} onChange={handleQuantityChange} />)}
                   
-                  <ImplementationSection 
-                    implementationFee={implementationFee} 
-                    annualDiscount={annualDiscount} 
-                    onImplementationFeeChange={handleImplementationFeeChange} 
-                    onAnnualDiscountChange={handleAnnualDiscountChange} 
-                  />
+                  <ImplementationSection implementationFee={implementationFee} annualDiscount={annualDiscount} onImplementationFeeChange={handleImplementationFeeChange} onAnnualDiscountChange={handleAnnualDiscountChange} />
                 </div>
               </div>
 
               <div className="md:col-span-4">
                 <div className="sticky top-8">
-                  <QuoteSummary 
-                    selectedModules={pricingModules} 
-                    quantities={quantities} 
-                    implementationFee={implementationFee} 
-                    annualDiscount={annualDiscount} 
-                    onSaveClick={handleSaveClick} 
-                    quoteName={currentQuote?.name} 
-                  />
+                  <QuoteSummary selectedModules={pricingModules} quantities={quantities} implementationFee={implementationFee} annualDiscount={annualDiscount} onSaveClick={handleSaveClick} quoteName={currentQuote?.name} />
                 </div>
               </div>
             </div>
           </div>
         </div>
         
-        <SaveQuoteModal 
-          open={saveModalOpen} 
-          onOpenChange={setSaveModalOpen} 
-          onSave={handleSaveQuote} 
-          isSaving={isSaving} 
-        />
+        <SaveQuoteModal open={saveModalOpen} onOpenChange={setSaveModalOpen} onSave={handleSaveQuote} isSaving={isSaving} />
       </div>
     </SidebarProvider>;
 };
-
 export default Dashboard;
