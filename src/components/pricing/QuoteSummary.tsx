@@ -83,10 +83,6 @@ const QuoteSummary = ({
         <div className="space-y-6">
           <div className="space-y-2">
             <div className="flex justify-between text-lg">
-              <span>Monthly Cost</span>
-              <span className="font-bold">{formatCurrency(monthlyCost)}</span>
-            </div>
-            <div className="flex justify-between text-lg">
               <span>Annual Cost</span>
               <span className="font-bold">{formatCurrency(monthlyCost * 12)}</span>
             </div>
@@ -111,9 +107,15 @@ const QuoteSummary = ({
           </div>
 
           <div>
-            <h3 className="uppercase text-sm font-semibold text-muted-foreground mb-3">
-              LINE ITEMS
-            </h3>
+            <div className="flex justify-between items-center mb-3">
+              <h3 className="uppercase text-sm font-semibold text-muted-foreground">
+                LINE ITEMS
+              </h3>
+              <div className="flex text-xs text-muted-foreground">
+                <span className="mr-4">Monthly</span>
+                <span>Annual</span>
+              </div>
+            </div>
             <Separator className="mb-4" />
 
             {Object.keys(groupedItems).length > 0 ? (
@@ -126,12 +128,17 @@ const QuoteSummary = ({
                     
                     {items.map((item) => (
                       <div key={item.id} className="flex justify-between py-1">
-                        <span className="text-sm">
+                        <span className="text-sm flex-grow">
                           {item.feature} × {quantities[item.id]} {quantities[item.id] === 1 ? item.unit : `${item.unit}s`}
                         </span>
-                        <span className="font-medium text-gray-700">
-                          {formatCurrency(item.monthly_price * quantities[item.id])}
-                        </span>
+                        <div className="flex text-right space-x-4">
+                          <span className="text-xs font-medium text-gray-500 w-20">
+                            {formatCurrency(item.monthly_price * quantities[item.id])}
+                          </span>
+                          <span className="text-xs font-medium text-gray-700 w-20">
+                            {formatCurrency(item.monthly_price * quantities[item.id] * 12)}
+                          </span>
+                        </div>
                       </div>
                     ))}
                     
@@ -152,7 +159,7 @@ const QuoteSummary = ({
       <CardFooter className="bg-white rounded-b-lg pt-0">
         <Button 
           onClick={onSaveClick}
-          className="w-full"
+          className="w-full bg-[#FF6D00] hover:bg-[#FF6D00]/90 text-white"
           disabled={selectedItems.length === 0}
         >
           <Save className="mr-2 h-4 w-4" />

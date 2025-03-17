@@ -38,7 +38,7 @@ export default function SaveQuoteModal({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Save Quote</DialogTitle>
+          <DialogTitle className="text-[#FF6D00]">Save Quote</DialogTitle>
           <DialogDescription>
             Give your quote a name to save it for future reference.
           </DialogDescription>
@@ -66,12 +66,14 @@ export default function SaveQuoteModal({
             variant="outline" 
             onClick={() => onOpenChange(false)}
             disabled={isSaving}
+            className="border-[#FF6D00]/20 text-gray-700 hover:border-[#FF6D00]/40 hover:bg-[#FF6D00]/5"
           >
             Cancel
           </Button>
           <Button 
             onClick={handleSave} 
             disabled={isSaving || !quoteName.trim()}
+            className="bg-[#FF6D00] hover:bg-[#FF6D00]/90 text-white"
           >
             {isSaving ? 'Saving...' : 'Save Quote'}
           </Button>
