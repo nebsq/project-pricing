@@ -1,4 +1,3 @@
-
 import { PricingModule } from "@/types/databaseTypes";
 import { formatCurrency } from "@/lib/utils";
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
@@ -116,7 +115,7 @@ const QuoteSummary = ({
                 LINE ITEMS
               </h3>
               <div className="flex text-xs text-muted-foreground">
-                <span className="w-24 text-right pr-4">Monthly</span>
+                <span className="w-24 text-right mr-0.5">Monthly</span>
                 <span className="w-24 text-right">Annual</span>
               </div>
             </div>
@@ -141,7 +140,7 @@ const QuoteSummary = ({
                               {item.feature} × {quantities[item.id]}
                             </span>
                             <div className="flex">
-                              <span className="text-xs font-medium text-gray-700 w-24 text-right pr-4">
+                              <span className="text-xs font-medium text-gray-700 w-24 text-right mr-0.5">
                                 {formatCurrency(monthlyPrice)}
                               </span>
                               <span className="text-xs font-medium text-gray-700 w-24 text-right">
