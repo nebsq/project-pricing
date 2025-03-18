@@ -130,7 +130,7 @@ export function AppSidebar({
             <img 
               src={inploiLogomark} 
               alt="inploi" 
-              className="h-7 w-auto" 
+              className="h-7 w-7 object-contain" 
             />
           ) : (
             <img 
