@@ -40,6 +40,23 @@ const Dashboard = () => {
   const [draftQuoteName, setDraftQuoteName] = useState<string>('');
   const [isEditingQuoteName, setIsEditingQuoteName] = useState(false);
 
+  const calculateAnnualCost = () => {
+    const selectedItems = pricingModules.filter(
+      (module) => quantities[module.id] && quantities[module.id] > 0
+    );
+    
+    const monthlyCost = selectedItems.reduce(
+      (total, module) => total + module.monthly_price * quantities[module.id],
+      0
+    );
+    
+    const baseAnnual = monthlyCost * 12;
+    if (annualDiscount) {
+      return baseAnnual * (1 - annualDiscount / 100);
+    }
+    return baseAnnual;
+  };
+
   useEffect(() => {
     checkUser();
     fetchPricingModules();
