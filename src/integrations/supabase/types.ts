@@ -130,6 +130,9 @@ export type Database = {
           implementation_fee: number | null
           name: string
           profile_id: string
+          recruitment_marketing_spend: number | null
+          sector: string | null
+          staffing_agency_spend: number | null
           updated_at: string
           vacancies: number | null
         }
@@ -145,6 +148,9 @@ export type Database = {
           implementation_fee?: number | null
           name: string
           profile_id: string
+          recruitment_marketing_spend?: number | null
+          sector?: string | null
+          staffing_agency_spend?: number | null
           updated_at?: string
           vacancies?: number | null
         }
@@ -160,6 +166,9 @@ export type Database = {
           implementation_fee?: number | null
           name?: string
           profile_id?: string
+          recruitment_marketing_spend?: number | null
+          sector?: string | null
+          staffing_agency_spend?: number | null
           updated_at?: string
           vacancies?: number | null
         }

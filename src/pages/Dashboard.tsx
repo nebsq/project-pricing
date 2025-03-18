@@ -13,6 +13,9 @@ import Metrics from "@/components/pricing/Metrics";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/navigation/AppSidebar";
 import SaveQuoteModal from "@/components/pricing/SaveQuoteModal";
+import { Input } from "@/components/ui/input";
+import { Pencil } from "lucide-react";
+
 const Dashboard = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
@@ -31,10 +34,25 @@ const Dashboard = () => {
   const [ftes, setFtes] = useState<number | null>(null);
   const [vacancies, setVacancies] = useState<number | null>(null);
   const [applications, setApplications] = useState<number | null>(null);
+  const [recruitmentMarketingSpend, setRecruitmentMarketingSpend] = useState<number | null>(null);
+  const [staffingAgencySpend, setStaffingAgencySpend] = useState<number | null>(null);
+  const [sector, setSector] = useState<string | null>(null);
+  const [draftQuoteName, setDraftQuoteName] = useState<string>('');
+  const [isEditingQuoteName, setIsEditingQuoteName] = useState(false);
+
   useEffect(() => {
     checkUser();
     fetchPricingModules();
   }, []);
+
+  useEffect(() => {
+    if (currentQuote) {
+      setDraftQuoteName(currentQuote.name);
+    } else {
+      setDraftQuoteName('');
+    }
+  }, [currentQuote]);
+
   const checkUser = async () => {
     try {
       const {
@@ -83,6 +101,7 @@ const Dashboard = () => {
       setLoading(false);
     }
   };
+
   const fetchPricingModules = async () => {
     try {
       const {
@@ -96,25 +115,31 @@ const Dashboard = () => {
       toast.error("Failed to load pricing modules");
     }
   };
+
   const handleSignOut = async () => {
     await supabase.auth.signOut();
     navigate('/auth');
   };
+
   const handleQuantityChange = (id: string, quantity: number) => {
     setQuantities(prev => ({
       ...prev,
       [id]: quantity
     }));
   };
+
   const handleImplementationFeeChange = (value: number | null) => {
     setImplementationFee(value);
   };
+
   const handleAnnualDiscountChange = (value: number | null) => {
     setAnnualDiscount(value);
   };
+
   const handleSaveClick = () => {
     setSaveModalOpen(true);
   };
+
   const handleRefreshPricing = async () => {
     if (pricingRefreshCooldown) {
       toast.info("Please wait before refreshing pricing again");
@@ -136,6 +161,7 @@ const Dashboard = () => {
       toast.error("Failed to refresh pricing");
     }
   };
+
   const handleSaveQuote = async (name: string) => {
     if (!profile) {
       toast.error("You must be logged in to save quotes");
@@ -149,7 +175,6 @@ const Dashboard = () => {
         return;
       }
 
-      // Create the quote data object with the correct type
       const quoteData = {
         id: currentQuote?.id,
         profile_id: profile.id,
@@ -162,6 +187,9 @@ const Dashboard = () => {
         ftes: ftes,
         vacancies: vacancies,
         applications: applications,
+        recruitment_marketing_spend: recruitmentMarketingSpend,
+        staffing_agency_spend: staffingAgencySpend,
+        sector: sector,
         updated_at: new Date().toISOString()
       };
       const {
@@ -179,7 +207,6 @@ const Dashboard = () => {
         throw new Error("Failed to create quote");
       }
 
-      // If we're updating an existing quote, delete all its items first
       if (currentQuote?.id) {
         const {
           error: deleteError
@@ -187,7 +214,6 @@ const Dashboard = () => {
         if (deleteError) throw deleteError;
       }
 
-      // Create quote items
       const quoteItems = selectedItems.map(item => ({
         quote_id: quoteId,
         pricing_module_id: item.id,
@@ -202,7 +228,6 @@ const Dashboard = () => {
       } = await supabase.from('quote_items').insert(quoteItems);
       if (itemsError) throw itemsError;
 
-      // Update the current quote with the new data
       if (currentQuote) {
         setCurrentQuote({
           ...currentQuote,
@@ -215,6 +240,9 @@ const Dashboard = () => {
           ftes: ftes,
           vacancies: vacancies,
           applications: applications,
+          recruitment_marketing_spend: recruitmentMarketingSpend,
+          staffing_agency_spend: staffingAgencySpend,
+          sector: sector,
           updated_at: new Date().toISOString()
         });
       } else if (quoteId) {
@@ -222,6 +250,8 @@ const Dashboard = () => {
           id: quoteId,
           profile_id: profile.id,
           name,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
           implementation_fee: implementationFee,
           annual_discount: annualDiscount,
           ae_csm_name: aeCsmName,
@@ -230,10 +260,13 @@ const Dashboard = () => {
           ftes: ftes,
           vacancies: vacancies,
           applications: applications,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
+          recruitment_marketing_spend: recruitmentMarketingSpend,
+          staffing_agency_spend: staffingAgencySpend,
+          sector: sector
         });
       }
+      
+      setDraftQuoteName(name);
       toast.success(`Quote "${name}" saved successfully`);
       setSaveModalOpen(false);
     } catch (error: any) {
@@ -243,6 +276,7 @@ const Dashboard = () => {
       setIsSaving(false);
     }
   };
+
   const loadQuote = async (quoteId: string) => {
     setLoading(true);
     try {
@@ -256,17 +290,21 @@ const Dashboard = () => {
         error: itemsError
       } = await supabase.from('quote_items').select('*').eq('quote_id', quoteId);
       if (itemsError) throw itemsError;
+      
       setCurrentQuote(quoteData as Quote);
       setImplementationFee(quoteData.implementation_fee);
       setAnnualDiscount(quoteData.annual_discount);
 
-      // Update metric values
       setAeCsmName(quoteData.ae_csm_name);
       setChampionName(quoteData.champion_name);
       setEconomicBuyerName(quoteData.economic_buyer_name);
       setFtes(quoteData.ftes);
       setVacancies(quoteData.vacancies);
       setApplications(quoteData.applications);
+      setRecruitmentMarketingSpend(quoteData.recruitment_marketing_spend);
+      setStaffingAgencySpend(quoteData.staffing_agency_spend);
+      setSector(quoteData.sector);
+      
       const newQuantities: Record<string, number> = {};
       itemsData.forEach((item: QuoteItem) => {
         if (item.pricing_module_id) {
@@ -274,6 +312,7 @@ const Dashboard = () => {
         }
       });
       setQuantities(newQuantities);
+      setDraftQuoteName(quoteData.name);
       toast.success(`Quote "${quoteData.name}" loaded`);
     } catch (error) {
       console.error('Error loading quote:', error);
@@ -282,6 +321,7 @@ const Dashboard = () => {
       setLoading(false);
     }
   };
+
   const handleNewQuote = () => {
     setCurrentQuote(null);
     setQuantities({});
@@ -293,9 +333,15 @@ const Dashboard = () => {
     setFtes(null);
     setVacancies(null);
     setApplications(null);
+    setRecruitmentMarketingSpend(null);
+    setStaffingAgencySpend(null);
+    setSector(null);
+    setDraftQuoteName('');
     toast.success("Started new quote");
   };
+
   const groupedModules = groupBy(pricingModules, 'module');
+
   if (loading) {
     return <SidebarProvider>
         <div className="min-h-screen bg-[#F9F8F4] flex">
@@ -317,6 +363,7 @@ const Dashboard = () => {
         </div>
       </SidebarProvider>;
   }
+
   return <SidebarProvider>
       <div className="min-h-screen bg-[#F9F8F4] flex">
         <AppSidebar onSignOut={handleSignOut} onQuoteSelect={loadQuote} onCreateNew={handleNewQuote} onRefreshPricing={handleRefreshPricing} profileId={profile?.id || null} />
@@ -362,13 +409,55 @@ const Dashboard = () => {
                 </div>
 
                 <div className="mb-4">
-                  <h2 className="text-2xl font-display font-semibold tracking-tight">
-                    {currentQuote ? `Editing: ${currentQuote.name}` : 'Create your quote'}
-                    <div className="mt-2 h-1 w-20 bg-gradient-to-r from-[#F97316] to-[#FF9A3C] rounded-full" />
-                  </h2>
+                  <div className="flex items-center gap-2">
+                    <h2 className="text-2xl font-display font-semibold tracking-tight">
+                      {currentQuote ? `Editing: ${currentQuote.name}` : 'Create your quote'}
+                    </h2>
+                    <button 
+                      onClick={() => setIsEditingQuoteName(!isEditingQuoteName)}
+                      className="text-[#FF6D00] hover:text-[#FF8C33] transition-colors"
+                      title="Edit quote name"
+                    >
+                      <Pencil size={16} />
+                    </button>
+                  </div>
+                  {isEditingQuoteName && (
+                    <div className="mt-2 mb-4">
+                      <Input
+                        value={draftQuoteName}
+                        onChange={(e) => setDraftQuoteName(e.target.value)}
+                        placeholder="Enter quote name"
+                        className="max-w-md"
+                      />
+                      <p className="text-xs text-muted-foreground mt-1">
+                        The name will be applied when you save the quote.
+                      </p>
+                    </div>
+                  )}
+                  <div className="mt-2 h-1 w-20 bg-gradient-to-r from-[#F97316] to-[#FF9A3C] rounded-full" />
                 </div>
 
-                <Metrics aeCsmName={aeCsmName} championName={championName} economicBuyerName={economicBuyerName} ftes={ftes} vacancies={vacancies} applications={applications} onAeCsmNameChange={setAeCsmName} onChampionNameChange={setChampionName} onEconomicBuyerNameChange={setEconomicBuyerName} onFtesChange={setFtes} onVacanciesChange={setVacancies} onApplicationsChange={setApplications} userName={profile?.full_name || ''} />
+                <Metrics 
+                  aeCsmName={aeCsmName} 
+                  championName={championName} 
+                  economicBuyerName={economicBuyerName} 
+                  ftes={ftes} 
+                  vacancies={vacancies} 
+                  applications={applications}
+                  recruitmentMarketingSpend={recruitmentMarketingSpend}
+                  staffingAgencySpend={staffingAgencySpend}
+                  sector={sector}
+                  onAeCsmNameChange={setAeCsmName} 
+                  onChampionNameChange={setChampionName} 
+                  onEconomicBuyerNameChange={setEconomicBuyerName} 
+                  onFtesChange={setFtes} 
+                  onVacanciesChange={setVacancies} 
+                  onApplicationsChange={setApplications}
+                  onRecruitmentMarketingSpendChange={setRecruitmentMarketingSpend}
+                  onStaffingAgencySpendChange={setStaffingAgencySpend}
+                  onSectorChange={setSector}
+                  userName={profile?.full_name || ''} 
+                />
 
                 <div className="space-y-6">
                   {Object.entries(groupedModules).map(([moduleName, features]) => <ModuleGroup key={moduleName} moduleName={moduleName} features={features} quantities={quantities} onChange={handleQuantityChange} />)}
@@ -379,15 +468,29 @@ const Dashboard = () => {
 
               <div className="md:col-span-4">
                 <div className="sticky top-8">
-                  <QuoteSummary selectedModules={pricingModules} quantities={quantities} implementationFee={implementationFee} annualDiscount={annualDiscount} onSaveClick={handleSaveClick} quoteName={currentQuote?.name} />
+                  <QuoteSummary 
+                    selectedModules={pricingModules} 
+                    quantities={quantities} 
+                    implementationFee={implementationFee} 
+                    annualDiscount={annualDiscount} 
+                    onSaveClick={handleSaveClick} 
+                    quoteName={draftQuoteName || currentQuote?.name} 
+                  />
                 </div>
               </div>
             </div>
           </div>
         </div>
         
-        <SaveQuoteModal open={saveModalOpen} onOpenChange={setSaveModalOpen} onSave={handleSaveQuote} isSaving={isSaving} />
+        <SaveQuoteModal 
+          open={saveModalOpen} 
+          onOpenChange={setSaveModalOpen} 
+          onSave={handleSaveQuote} 
+          isSaving={isSaving}
+          initialName={draftQuoteName} 
+        />
       </div>
     </SidebarProvider>;
 };
+
 export default Dashboard;

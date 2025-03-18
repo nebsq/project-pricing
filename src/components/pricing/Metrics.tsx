@@ -1,7 +1,9 @@
+
 import { useEffect, useState } from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+
 interface MetricsProps {
   aeCsmName: string | null;
   championName: string | null;
@@ -9,14 +11,21 @@ interface MetricsProps {
   ftes: number | null;
   vacancies: number | null;
   applications: number | null;
+  recruitmentMarketingSpend: number | null;
+  staffingAgencySpend: number | null;
+  sector: string | null;
   onAeCsmNameChange: (value: string) => void;
   onChampionNameChange: (value: string) => void;
   onEconomicBuyerNameChange: (value: string) => void;
   onFtesChange: (value: number | null) => void;
   onVacanciesChange: (value: number | null) => void;
   onApplicationsChange: (value: number | null) => void;
+  onRecruitmentMarketingSpendChange: (value: number | null) => void;
+  onStaffingAgencySpendChange: (value: number | null) => void;
+  onSectorChange: (value: string) => void;
   userName: string;
 }
+
 const Metrics = ({
   aeCsmName,
   championName,
@@ -24,12 +33,18 @@ const Metrics = ({
   ftes,
   vacancies,
   applications,
+  recruitmentMarketingSpend,
+  staffingAgencySpend,
+  sector,
   onAeCsmNameChange,
   onChampionNameChange,
   onEconomicBuyerNameChange,
   onFtesChange,
   onVacanciesChange,
   onApplicationsChange,
+  onRecruitmentMarketingSpendChange,
+  onStaffingAgencySpendChange,
+  onSectorChange,
   userName
 }: MetricsProps) => {
   const [localAeCsmName, setLocalAeCsmName] = useState<string>(aeCsmName || '');
@@ -41,6 +56,7 @@ const Metrics = ({
       onAeCsmNameChange(userName);
     }
   }, [userName, localAeCsmName, onAeCsmNameChange]);
+
   const handleNumberChange = (value: string, setter: (value: number | null) => void) => {
     if (value === '') {
       setter(null);
@@ -51,6 +67,7 @@ const Metrics = ({
       }
     }
   };
+
   return <Card className="bg-white/50 backdrop-blur-sm border border-[#FF4D00]/10 mb-6">
       <CardContent className="pt-6">
         <div className="space-y-6">
@@ -62,10 +79,15 @@ const Metrics = ({
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
               <div className="space-y-2">
                 <Label htmlFor="ae-csm-name">AE / CSM Name</Label>
-                <Input id="ae-csm-name" value={localAeCsmName} onChange={e => {
-                setLocalAeCsmName(e.target.value);
-                onAeCsmNameChange(e.target.value);
-              }} placeholder="Enter AE/CSM name" />
+                <Input 
+                  id="ae-csm-name" 
+                  value={localAeCsmName} 
+                  onChange={e => {
+                    setLocalAeCsmName(e.target.value);
+                    onAeCsmNameChange(e.target.value);
+                  }} 
+                  placeholder="Enter AE/CSM name" 
+                />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="champion-name">Champion:</Label>
@@ -77,7 +99,7 @@ const Metrics = ({
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
               <div className="space-y-2">
                 <Label htmlFor="ftes"># FTEs</Label>
                 <Input id="ftes" type="number" value={ftes === null ? '' : ftes} onChange={e => handleNumberChange(e.target.value, onFtesChange)} placeholder="Enter number of FTEs" />
@@ -91,9 +113,42 @@ const Metrics = ({
                 <Input id="applications" type="number" value={applications === null ? '' : applications} onChange={e => handleNumberChange(e.target.value, onApplicationsChange)} placeholder="Enter number of Applications" />
               </div>
             </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="recruitment-marketing-spend">Recruitment Marketing Spend</Label>
+                <Input 
+                  id="recruitment-marketing-spend" 
+                  type="number" 
+                  value={recruitmentMarketingSpend === null ? '' : recruitmentMarketingSpend} 
+                  onChange={e => handleNumberChange(e.target.value, onRecruitmentMarketingSpendChange)} 
+                  placeholder="Enter marketing spend" 
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="staffing-agency-spend">Staffing & Agency Spend</Label>
+                <Input 
+                  id="staffing-agency-spend" 
+                  type="number" 
+                  value={staffingAgencySpend === null ? '' : staffingAgencySpend} 
+                  onChange={e => handleNumberChange(e.target.value, onStaffingAgencySpendChange)} 
+                  placeholder="Enter staffing spend" 
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="sector">Sector</Label>
+                <Input 
+                  id="sector" 
+                  value={sector || ''} 
+                  onChange={e => onSectorChange(e.target.value)} 
+                  placeholder="Enter sector" 
+                />
+              </div>
+            </div>
           </div>
         </div>
       </CardContent>
     </Card>;
 };
+
 export default Metrics;

@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -17,20 +17,27 @@ interface SaveQuoteModalProps {
   onOpenChange: (open: boolean) => void;
   onSave: (name: string) => void;
   isSaving: boolean;
+  initialName?: string;
 }
 
 export default function SaveQuoteModal({ 
   open, 
   onOpenChange, 
   onSave, 
-  isSaving 
+  isSaving,
+  initialName = ''
 }: SaveQuoteModalProps) {
   const [quoteName, setQuoteName] = useState('');
+  
+  useEffect(() => {
+    if (open && initialName) {
+      setQuoteName(initialName);
+    }
+  }, [open, initialName]);
   
   const handleSave = () => {
     if (quoteName.trim()) {
       onSave(quoteName.trim());
-      setQuoteName('');
     }
   };
 
@@ -73,6 +80,7 @@ export default function SaveQuoteModal({
             onClick={handleSave} 
             disabled={isSaving || !quoteName.trim()}
             variant="default"
+            className="bg-[#FF6D00] hover:bg-[#FF8C33]"
           >
             {isSaving ? 'Saving...' : 'Save Quote'}
           </Button>

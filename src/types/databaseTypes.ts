@@ -36,6 +36,9 @@ export interface Quote {
   ftes?: number | null;
   vacancies?: number | null;
   applications?: number | null;
+  recruitment_marketing_spend?: number | null;
+  staffing_agency_spend?: number | null;
+  sector?: string | null;
 }
 
 export interface QuoteItem {
