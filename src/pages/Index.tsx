@@ -62,7 +62,7 @@ const Index = () => {
             </div>
             
             {/* Headline */}
-            <h1 className="text-4xl sm:text-5xl xl:text-7xl font-display font-semibold tracking-tight text-foreground mb-6 leading-tight text-balance mx-0 my-[17px] py-[29px] px-[23px] md:text-6xl">inploi's pricing hey freddie</h1>
+            <h1 className="text-4xl sm:text-5xl xl:text-7xl font-display font-semibold tracking-tight text-foreground mb-6 leading-tight text-balance mx-0 my-[17px] py-[29px] px-[23px] md:text-6xl">inploi's pricing calculator</h1>
             
             {/* Subheading */}
             <p className="text-lg sm:text-xl text-foreground/80 mb-10 max-w-3xl text-balance">
