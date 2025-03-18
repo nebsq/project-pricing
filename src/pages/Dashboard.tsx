@@ -341,6 +341,7 @@ const Dashboard = () => {
   };
 
   const groupedModules = groupBy(pricingModules, 'module');
+  const annualCost = calculateAnnualCost();
 
   if (loading) {
     return <SidebarProvider>
@@ -457,6 +458,7 @@ const Dashboard = () => {
                   onStaffingAgencySpendChange={setStaffingAgencySpend}
                   onSectorChange={setSector}
                   userName={profile?.full_name || ''} 
+                  annualCost={annualCost}
                 />
 
                 <div className="space-y-6">

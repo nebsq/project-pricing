@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { formatCurrency } from "@/lib/utils";
 
 interface MetricsProps {
   aeCsmName: string | null;
@@ -24,6 +25,7 @@ interface MetricsProps {
   onStaffingAgencySpendChange: (value: number | null) => void;
   onSectorChange: (value: string) => void;
   userName: string;
+  annualCost: number;
 }
 
 const Metrics = ({
@@ -45,7 +47,8 @@ const Metrics = ({
   onRecruitmentMarketingSpendChange,
   onStaffingAgencySpendChange,
   onSectorChange,
-  userName
+  userName,
+  annualCost
 }: MetricsProps) => {
   const [localAeCsmName, setLocalAeCsmName] = useState<string>(aeCsmName || '');
 
@@ -67,6 +70,11 @@ const Metrics = ({
       }
     }
   };
+
+  // Calculate cost per metric
+  const costPerFte = ftes && ftes > 0 ? annualCost / ftes : null;
+  const costPerVacancy = vacancies && vacancies > 0 ? annualCost / vacancies : null;
+  const costPerApplication = applications && applications > 0 ? annualCost / applications : null;
 
   return <Card className="bg-white/50 backdrop-blur-sm border border-[#FF4D00]/10 mb-6">
       <CardContent className="pt-6">
@@ -103,14 +111,29 @@ const Metrics = ({
               <div className="space-y-2">
                 <Label htmlFor="ftes"># FTEs</Label>
                 <Input id="ftes" type="number" value={ftes === null ? '' : ftes} onChange={e => handleNumberChange(e.target.value, onFtesChange)} placeholder="Enter number of FTEs" />
+                {costPerFte && (
+                  <div className="text-xs px-2 py-1 mt-1 bg-[#F3F3F3] text-[#555555] rounded">
+                    {formatCurrency(costPerFte)} per FTE
+                  </div>
+                )}
               </div>
               <div className="space-y-2">
                 <Label htmlFor="vacancies"># Vacancies</Label>
                 <Input id="vacancies" type="number" value={vacancies === null ? '' : vacancies} onChange={e => handleNumberChange(e.target.value, onVacanciesChange)} placeholder="Enter number of Vacancies" />
+                {costPerVacancy && (
+                  <div className="text-xs px-2 py-1 mt-1 bg-[#F3F3F3] text-[#555555] rounded">
+                    {formatCurrency(costPerVacancy)} per vacancy
+                  </div>
+                )}
               </div>
               <div className="space-y-2">
                 <Label htmlFor="applications"># Applications</Label>
                 <Input id="applications" type="number" value={applications === null ? '' : applications} onChange={e => handleNumberChange(e.target.value, onApplicationsChange)} placeholder="Enter number of Applications" />
+                {costPerApplication && (
+                  <div className="text-xs px-2 py-1 mt-1 bg-[#F3F3F3] text-[#555555] rounded">
+                    {formatCurrency(costPerApplication)} per application
+                  </div>
+                )}
               </div>
             </div>
 
