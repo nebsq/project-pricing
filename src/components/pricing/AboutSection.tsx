@@ -1,9 +1,6 @@
-
 import { Card } from "@/components/ui/card";
-
 const AboutSection = () => {
-  return (
-    <div className="bg-white/50 backdrop-blur-sm rounded-lg border border-[#FF4D00]/10 p-6 mb-8">
+  return <div className="bg-white/50 backdrop-blur-sm rounded-lg border border-[#FF4D00]/10 p-6 mb-8">
       <h2 className="text-xl font-semibold font-display tracking-tight mb-4">
         <span className="bg-gradient-to-r from-[#F97316] to-[#FF9A3C] bg-clip-text text-transparent">
           About
@@ -16,7 +13,7 @@ const AboutSection = () => {
         Only items with column <code className="px-1.5 py-0.5 rounded bg-[#FF4D00]/5 text-[#FF4D00] font-mono text-sm font-medium border border-[#FF4D00]/10">release_stage = Available (General)</code> are imported.
       </p>
       <p className="text-muted-foreground">
-        <strong>Things to do (last update: 9pm Monday March 17th): </strong>
+        <strong>Things to do (last update: 9pm Tuesday March 18th):</strong>
       </p>
       
       <ul className="list-disc list-inside mt-2 text-muted-foreground">
@@ -29,8 +26,6 @@ const AboutSection = () => {
         <li className="ml-4">Discovery needed - what do we want here? What format is useful? .pdf? Slick copy+paste?</li>
         <li>❓ TBD on other points in your email Jake, needs scope.</li>
       </ul>
-    </div>
-  );
+    </div>;
 };
-
 export default AboutSection;
