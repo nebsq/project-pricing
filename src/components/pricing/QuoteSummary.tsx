@@ -115,9 +115,9 @@ const QuoteSummary = ({
               <h3 className="uppercase text-sm font-semibold text-muted-foreground">
                 LINE ITEMS
               </h3>
-              <div className="flex text-xs text-muted-foreground space-x-4">
-                <span className="w-24 text-right">Monthly</span>
-                <span className="w-24 text-right">Annual</span>
+              <div className="flex text-xs text-muted-foreground">
+                <span className="w-16 sm:w-20 text-right mr-2">Monthly</span>
+                <span className="w-16 sm:w-20 text-right">Annual</span>
               </div>
             </div>
             <Separator className="mb-4" />
@@ -137,14 +137,14 @@ const QuoteSummary = ({
                         const monthlyPrice = item.monthly_price * quantities[item.id];
                         return (
                           <div key={item.id} className="flex justify-between py-1">
-                            <span className="text-xs text-gray-700">
+                            <span className="text-xs text-gray-700 mr-2 flex-1 break-words">
                               {item.feature} × {quantities[item.id]}
                             </span>
-                            <div className="flex space-x-4">
-                              <span className="text-xs font-medium text-gray-700 w-24 text-right">
+                            <div className="flex shrink-0">
+                              <span className="text-xs font-medium text-gray-700 w-16 sm:w-20 text-right mr-2">
                                 {formatCurrency(monthlyPrice)}
                               </span>
-                              <span className="text-xs font-medium text-gray-700 w-24 text-right">
+                              <span className="text-xs font-medium text-gray-700 w-16 sm:w-20 text-right">
                                 {formatCurrency(monthlyPrice * 12)}
                               </span>
                             </div>

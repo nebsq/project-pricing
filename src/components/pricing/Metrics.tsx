@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -71,9 +72,9 @@ const Metrics = ({
   };
 
   // Calculate cost per metric with 2 decimal places
-  const costPerFte = ftes && ftes > 0 ? Number((annualCost / ftes).toFixed(2)) : null;
-  const costPerVacancy = vacancies && vacancies > 0 ? Number((annualCost / vacancies).toFixed(2)) : null;
-  const costPerApplication = applications && applications > 0 ? Number((annualCost / applications).toFixed(2)) : null;
+  const costPerFte = ftes && ftes > 0 && annualCost > 0 ? (annualCost / ftes) : null;
+  const costPerVacancy = vacancies && vacancies > 0 && annualCost > 0 ? (annualCost / vacancies) : null;
+  const costPerApplication = applications && applications > 0 && annualCost > 0 ? (annualCost / applications) : null;
 
   return <Card className="bg-white/50 backdrop-blur-sm border border-[#FF4D00]/10 mb-6">
       <CardContent className="pt-6">
@@ -112,7 +113,7 @@ const Metrics = ({
                 <Input id="ftes" type="number" value={ftes === null ? '' : ftes} onChange={e => handleNumberChange(e.target.value, onFtesChange)} placeholder="Enter number of FTEs" />
                 {costPerFte && costPerFte > 0 && (
                   <div className="text-xs px-2 py-1 mt-1 bg-[#FF4D00]/5 text-[#FF4D00] rounded">
-                    {formatCurrency(costPerFte)} per FTE
+                    {formatCurrency(costPerFte, 2)} per FTE
                   </div>
                 )}
               </div>
@@ -121,7 +122,7 @@ const Metrics = ({
                 <Input id="vacancies" type="number" value={vacancies === null ? '' : vacancies} onChange={e => handleNumberChange(e.target.value, onVacanciesChange)} placeholder="Enter number of Vacancies" />
                 {costPerVacancy && costPerVacancy > 0 && (
                   <div className="text-xs px-2 py-1 mt-1 bg-[#FF4D00]/5 text-[#FF4D00] rounded">
-                    {formatCurrency(costPerVacancy)} per vacancy
+                    {formatCurrency(costPerVacancy, 2)} per vacancy
                   </div>
                 )}
               </div>
@@ -130,7 +131,7 @@ const Metrics = ({
                 <Input id="applications" type="number" value={applications === null ? '' : applications} onChange={e => handleNumberChange(e.target.value, onApplicationsChange)} placeholder="Enter number of Applications" />
                 {costPerApplication && costPerApplication > 0 && (
                   <div className="text-xs px-2 py-1 mt-1 bg-[#FF4D00]/5 text-[#FF4D00] rounded">
-                    {formatCurrency(costPerApplication)} per application
+                    {formatCurrency(costPerApplication, 2)} per application
                   </div>
                 )}
               </div>
