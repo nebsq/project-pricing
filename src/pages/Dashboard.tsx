@@ -1,20 +1,14 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardHeader } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { Profile, PricingModule, Quote, QuoteItem } from "@/types/databaseTypes";
-import { groupBy } from "@/lib/utils";
-import ModuleGroup from "@/components/pricing/ModuleGroup";
-import QuoteSummary from "@/components/pricing/QuoteSummary";
-import ImplementationSection from "@/components/pricing/ImplementationSection";
-import Metrics from "@/components/pricing/Metrics";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/navigation/AppSidebar";
 import SaveQuoteModal from "@/components/pricing/SaveQuoteModal";
-import { Input } from "@/components/ui/input";
-import { Pencil } from "lucide-react";
+import DashboardContent from "@/components/pricing/DashboardContent";
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -38,24 +32,6 @@ const Dashboard = () => {
   const [staffingAgencySpend, setStaffingAgencySpend] = useState<number | null>(null);
   const [sector, setSector] = useState<string | null>(null);
   const [draftQuoteName, setDraftQuoteName] = useState<string>('');
-  const [isEditingQuoteName, setIsEditingQuoteName] = useState(false);
-
-  const calculateAnnualCost = () => {
-    const selectedItems = pricingModules.filter(
-      (module) => quantities[module.id] && quantities[module.id] > 0
-    );
-    
-    const monthlyCost = selectedItems.reduce(
-      (total, module) => total + module.monthly_price * quantities[module.id],
-      0
-    );
-    
-    const baseAnnual = monthlyCost * 12;
-    if (annualDiscount) {
-      return baseAnnual * (1 - annualDiscount / 100);
-    }
-    return baseAnnual;
-  };
 
   useEffect(() => {
     checkUser();
@@ -357,148 +333,80 @@ const Dashboard = () => {
     toast.success("Started new quote");
   };
 
-  const groupedModules = groupBy(pricingModules, 'module');
-  const annualCost = calculateAnnualCost();
-
-  if (loading) {
-    return <SidebarProvider>
+  if (loading || !profile) {
+    return (
+      <SidebarProvider>
         <div className="min-h-screen bg-[#F9F8F4] flex">
-          <AppSidebar onSignOut={handleSignOut} onQuoteSelect={loadQuote} onCreateNew={handleNewQuote} onRefreshPricing={handleRefreshPricing} profileId={profile?.id || null} />
+          <AppSidebar 
+            onSignOut={handleSignOut} 
+            onQuoteSelect={loadQuote} 
+            onCreateNew={handleNewQuote} 
+            onRefreshPricing={handleRefreshPricing} 
+            profileId={profile?.id || null} 
+          />
           <div className="flex-1 p-6 pt-8">
             <Card>
               <CardHeader>
                 <Skeleton className="h-8 w-1/3" />
               </CardHeader>
-              <CardContent>
+              <div className="p-6">
                 <div className="space-y-4">
                   <Skeleton className="h-4 w-full" />
                   <Skeleton className="h-4 w-full" />
                   <Skeleton className="h-4 w-full" />
                 </div>
-              </CardContent>
+              </div>
             </Card>
           </div>
         </div>
-      </SidebarProvider>;
+      </SidebarProvider>
+    );
   }
 
-  return <SidebarProvider>
+  return (
+    <SidebarProvider>
       <div className="min-h-screen bg-[#F9F8F4] flex">
-        <AppSidebar onSignOut={handleSignOut} onQuoteSelect={loadQuote} onCreateNew={handleNewQuote} onRefreshPricing={handleRefreshPricing} profileId={profile?.id || null} />
+        <AppSidebar 
+          onSignOut={handleSignOut} 
+          onQuoteSelect={loadQuote} 
+          onCreateNew={handleNewQuote} 
+          onRefreshPricing={handleRefreshPricing} 
+          profileId={profile.id} 
+        />
         
         <div className="flex-1 p-6 pt-8">
-          <div className="space-y-6 max-w-7xl mx-auto">
-            <div className="flex justify-between items-center">
-              <h1 className="text-3xl font-bold text-[#F97316] font-display tracking-tight">
-                <span className="bg-gradient-to-r from-[#F97316] to-[#FF9A3C] bg-clip-text text-transparent">
-                  pricing calculator
-                </span>
-              </h1>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-12 gap-8">
-              <div className="md:col-span-8">
-                <div className="bg-white/50 backdrop-blur-sm rounded-lg border border-[#FF4D00]/10 p-6 mb-8">
-                  <h2 className="text-xl font-semibold font-display tracking-tight mb-4">
-                    <span className="bg-gradient-to-r from-[#F97316] to-[#FF9A3C] bg-clip-text text-transparent">
-                      About
-                    </span>
-                  </h2>
-                  <p className="text-muted-foreground">
-                    This calculator reads the line items and values directly from the 'Pricing' google sheet.
-                  </p>
-                  <p className="text-muted-foreground mb-4">
-                    Only items with column <code className="px-1.5 py-0.5 rounded bg-[#FF4D00]/5 text-[#FF4D00] font-mono text-sm font-medium border border-[#FF4D00]/10">release_stage = Available (General)</code> are imported.
-                  </p>
-                  <p className="text-muted-foreground">
-                    <strong>Things to do (last update: 9pm Monday March 17th): </strong>
-                  </p>
-                  
-                  <ul className="list-disc list-inside mt-2 text-muted-foreground">
-                    <li>✅ Do we want the LINE ITEMS in the quote summary with monthly or annual prices? <strong>Added both.</strong></li>
-                    <li>✅ Added 'Metrics' section. All these values are now stored together with each Quote.</li>
-                    <li>✅ Cleaned up the 'Quote Summary' a bit. </li>
-                    <li>✅ Created the ability to name and save quotes. If there was a discrepancy between an already saved quote and the currently available pricing modules it should warn you.</li>
-                    <li>🚧 Unclear if pricing versions are required. Needs scoping. <strong>Semi-implemented it anyway in the above point.</strong></li>
-                    <li>❓Enable copying or exporting the "Quote Summary" for use in other docs.</li>
-                    <li className="ml-4">Discovery needed - what do we want here? What format is useful? .pdf? Slick copy+paste?</li>
-                    <li>❓ TBD on other points in your email Jake, needs scope.</li>
-                  </ul>
-                </div>
-
-                <div className="mb-4">
-                  <div className="flex items-center gap-2">
-                    <h2 className="text-2xl font-display font-semibold tracking-tight">
-                      {currentQuote ? `Editing: ${currentQuote.name}` : 'Create your quote'}
-                    </h2>
-                    <button 
-                      onClick={() => setIsEditingQuoteName(!isEditingQuoteName)}
-                      className="text-[#FF6D00] hover:text-[#FF8C33] transition-colors"
-                      title="Edit quote name"
-                    >
-                      <Pencil size={16} />
-                    </button>
-                  </div>
-                  {isEditingQuoteName && (
-                    <div className="mt-2 mb-4">
-                      <Input
-                        value={draftQuoteName}
-                        onChange={(e) => setDraftQuoteName(e.target.value)}
-                        placeholder="Enter quote name"
-                        className="max-w-md"
-                      />
-                      <p className="text-xs text-muted-foreground mt-1">
-                        The name will be applied when you save the quote.
-                      </p>
-                    </div>
-                  )}
-                  <div className="mt-2 h-1 w-20 bg-gradient-to-r from-[#F97316] to-[#FF9A3C] rounded-full" />
-                </div>
-
-                <Metrics 
-                  aeCsmName={aeCsmName} 
-                  championName={championName} 
-                  economicBuyerName={economicBuyerName} 
-                  ftes={ftes} 
-                  vacancies={vacancies} 
-                  applications={applications}
-                  recruitmentMarketingSpend={recruitmentMarketingSpend}
-                  staffingAgencySpend={staffingAgencySpend}
-                  sector={sector}
-                  onAeCsmNameChange={setAeCsmName} 
-                  onChampionNameChange={setChampionName} 
-                  onEconomicBuyerNameChange={setEconomicBuyerName} 
-                  onFtesChange={setFtes} 
-                  onVacanciesChange={setVacancies} 
-                  onApplicationsChange={setApplications}
-                  onRecruitmentMarketingSpendChange={setRecruitmentMarketingSpend}
-                  onStaffingAgencySpendChange={setStaffingAgencySpend}
-                  onSectorChange={setSector}
-                  userName={profile?.full_name || ''} 
-                  annualCost={annualCost}
-                />
-
-                <div className="space-y-6">
-                  {Object.entries(groupedModules).map(([moduleName, features]) => <ModuleGroup key={moduleName} moduleName={moduleName} features={features} quantities={quantities} onChange={handleQuantityChange} />)}
-                  
-                  <ImplementationSection implementationFee={implementationFee} annualDiscount={annualDiscount} onImplementationFeeChange={handleImplementationFeeChange} onAnnualDiscountChange={handleAnnualDiscountChange} />
-                </div>
-              </div>
-
-              <div className="md:col-span-4">
-                <div className="sticky top-8">
-                  <QuoteSummary 
-                    selectedModules={pricingModules} 
-                    quantities={quantities} 
-                    implementationFee={implementationFee} 
-                    annualDiscount={annualDiscount} 
-                    onSaveClick={handleSaveClick} 
-                    quoteName={draftQuoteName || currentQuote?.name} 
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
+          <DashboardContent 
+            profile={profile}
+            pricingModules={pricingModules}
+            quantities={quantities}
+            implementationFee={implementationFee}
+            annualDiscount={annualDiscount}
+            aeCsmName={aeCsmName}
+            championName={championName}
+            economicBuyerName={economicBuyerName}
+            ftes={ftes}
+            vacancies={vacancies}
+            applications={applications}
+            recruitmentMarketingSpend={recruitmentMarketingSpend}
+            staffingAgencySpend={staffingAgencySpend}
+            sector={sector}
+            currentQuote={currentQuote}
+            draftQuoteName={draftQuoteName}
+            onQuantityChange={handleQuantityChange}
+            onImplementationFeeChange={handleImplementationFeeChange}
+            onAnnualDiscountChange={handleAnnualDiscountChange}
+            onAeCsmNameChange={setAeCsmName}
+            onChampionNameChange={setChampionName}
+            onEconomicBuyerNameChange={setEconomicBuyerName}
+            onFtesChange={setFtes}
+            onVacanciesChange={setVacancies}
+            onApplicationsChange={setApplications}
+            onRecruitmentMarketingSpendChange={setRecruitmentMarketingSpend}
+            onStaffingAgencySpendChange={setStaffingAgencySpend}
+            onSectorChange={setSector}
+            onDraftQuoteNameChange={setDraftQuoteName}
+            onSaveClick={handleSaveClick}
+          />
         </div>
         
         <SaveQuoteModal 
@@ -509,7 +417,8 @@ const Dashboard = () => {
           initialName={draftQuoteName} 
         />
       </div>
-    </SidebarProvider>;
+    </SidebarProvider>
+  );
 };
 
 export default Dashboard;

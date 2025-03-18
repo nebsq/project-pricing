@@ -111,8 +111,8 @@ const Metrics = ({
               <div className="space-y-2">
                 <Label htmlFor="ftes"># FTEs</Label>
                 <Input id="ftes" type="number" value={ftes === null ? '' : ftes} onChange={e => handleNumberChange(e.target.value, onFtesChange)} placeholder="Enter number of FTEs" />
-                {costPerFte && (
-                  <div className="text-xs px-2 py-1 mt-1 bg-[#F3F3F3] text-[#555555] rounded">
+                {costPerFte && costPerFte > 0 && (
+                  <div className="text-xs px-2 py-1 mt-1 bg-[#FF4D00]/5 text-[#FF4D00] rounded">
                     {formatCurrency(costPerFte)} per FTE
                   </div>
                 )}
@@ -120,8 +120,8 @@ const Metrics = ({
               <div className="space-y-2">
                 <Label htmlFor="vacancies"># Vacancies</Label>
                 <Input id="vacancies" type="number" value={vacancies === null ? '' : vacancies} onChange={e => handleNumberChange(e.target.value, onVacanciesChange)} placeholder="Enter number of Vacancies" />
-                {costPerVacancy && (
-                  <div className="text-xs px-2 py-1 mt-1 bg-[#F3F3F3] text-[#555555] rounded">
+                {costPerVacancy && costPerVacancy > 0 && (
+                  <div className="text-xs px-2 py-1 mt-1 bg-[#FF4D00]/5 text-[#FF4D00] rounded">
                     {formatCurrency(costPerVacancy)} per vacancy
                   </div>
                 )}
@@ -129,8 +129,8 @@ const Metrics = ({
               <div className="space-y-2">
                 <Label htmlFor="applications"># Applications</Label>
                 <Input id="applications" type="number" value={applications === null ? '' : applications} onChange={e => handleNumberChange(e.target.value, onApplicationsChange)} placeholder="Enter number of Applications" />
-                {costPerApplication && (
-                  <div className="text-xs px-2 py-1 mt-1 bg-[#F3F3F3] text-[#555555] rounded">
+                {costPerApplication && costPerApplication > 0 && (
+                  <div className="text-xs px-2 py-1 mt-1 bg-[#FF4D00]/5 text-[#FF4D00] rounded">
                     {formatCurrency(costPerApplication)} per application
                   </div>
                 )}
