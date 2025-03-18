@@ -19,7 +19,8 @@ const AboutSection = () => {
       <ul className="list-disc list-inside mt-2 text-muted-foreground">
         <li>✅ Updated 'Metrcs' section to include more metrics.</li>
         <li>✅ Added sense checks once metrics + annual cost are greater than 0</li>
-        <li>✅ Cleaned up the 'Quote Summary' a bit. </li>
+        <li>✅ Cleaned up the 'Quote Summary' a bit </li>
+        <li>✅ Cleaned up the logo and the favicon </li>
       </ul>
     </div>;
 };
