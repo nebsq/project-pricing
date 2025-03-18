@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -71,10 +70,10 @@ const Metrics = ({
     }
   };
 
-  // Calculate cost per metric
-  const costPerFte = ftes && ftes > 0 ? annualCost / ftes : null;
-  const costPerVacancy = vacancies && vacancies > 0 ? annualCost / vacancies : null;
-  const costPerApplication = applications && applications > 0 ? annualCost / applications : null;
+  // Calculate cost per metric with 2 decimal places
+  const costPerFte = ftes && ftes > 0 ? Number((annualCost / ftes).toFixed(2)) : null;
+  const costPerVacancy = vacancies && vacancies > 0 ? Number((annualCost / vacancies).toFixed(2)) : null;
+  const costPerApplication = applications && applications > 0 ? Number((annualCost / applications).toFixed(2)) : null;
 
   return <Card className="bg-white/50 backdrop-blur-sm border border-[#FF4D00]/10 mb-6">
       <CardContent className="pt-6">
