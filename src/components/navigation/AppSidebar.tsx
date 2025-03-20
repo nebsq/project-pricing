@@ -21,6 +21,8 @@ import { formatDistanceToNow } from 'date-fns';
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
 
+const PRICING_UPDATE_DISABLED = true; // Toggle this to enable/disable the feature
+
 interface AppSidebarProps {
   onSignOut: () => Promise<void>;
   onQuoteSelect: (quoteId: string) => void;
@@ -152,30 +154,32 @@ export function AppSidebar({
           
           <SidebarMenuButton
             onClick={() => {}}
-            onMouseDown={startHolding}
-            onMouseUp={resetButton}
-            onMouseLeave={resetButton}
-            onTouchStart={startHolding}
-            onTouchEnd={resetButton}
-            disabled={isDisabled}
-            tooltip={isDisabled ? "Please wait 1 minute" : "Hold to update pricing"}
+            onMouseDown={PRICING_UPDATE_DISABLED ? undefined : startHolding}
+            onMouseUp={PRICING_UPDATE_DISABLED ? undefined : resetButton}
+            onMouseLeave={PRICING_UPDATE_DISABLED ? undefined : resetButton}
+            onTouchStart={PRICING_UPDATE_DISABLED ? undefined : startHolding}
+            onTouchEnd={PRICING_UPDATE_DISABLED ? undefined : resetButton}
+            disabled={PRICING_UPDATE_DISABLED || isDisabled}
+            tooltip={PRICING_UPDATE_DISABLED ? "Temporarily unavailable" : isDisabled ? "Please wait 1 minute" : "Hold to update pricing"}
             className={cn(
               buttonStyles,
               "relative overflow-hidden",
-              isDisabled && "opacity-50 cursor-not-allowed"
+              (PRICING_UPDATE_DISABLED || isDisabled) && "opacity-50 cursor-not-allowed"
             )}
           >
             <RotateCcw className="h-4 w-4 text-muted-foreground" />
             {!isCollapsed && (
               <span>
-                {isDisabled
+                {PRICING_UPDATE_DISABLED 
+                  ? "Updates paused"
+                  : isDisabled
                   ? "Please wait 1 minute"
                   : isHolding
                   ? "Hold to confirm..."
                   : "Get Latest Pricing"}
               </span>
             )}
-            {isHolding && (
+            {isHolding && !PRICING_UPDATE_DISABLED && (
               <div 
                 className="absolute inset-0 bg-orange-500/10 transition-transform duration-[3000ms] ease-linear origin-left"
                 style={{ transform: `scaleX(${progress / 100})` }}
